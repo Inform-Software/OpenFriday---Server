@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpenFriday - Verwaltung</title>
+
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/style/style.css" rel="stylesheet">
+    <link href="/style/manage.css" rel="stylesheet">
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/scripts/app.js"></script>
+</head>
+
+<body>
+    <noscript>
+        <h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+            enabled. Please enable
+            Javascript and reload this page!</h2>
+    </noscript>
+    <div id="content" class="vertical-content">
+        <div class="vertical-box">
+            <h1>Verwaltung - Bitte nur mit Vorsicht verwenden</h1>
+            <button onclick="showWorkshopInput()">Hinzuf&uuml;gen</button>
+            <div v-for="(workshop, index) in workshops" v-bind:index="index" v-bind:id="workshop.id"
+                class="workshop">
+                <div title="Name" class="work-name"><span class="hint">Name:</span> {{workshop.name}}</div>
+                <div title="Kategorie" class="work-category"><span class="hint">Kategorie:</span> {{workshop.topic}}</div>
+                <!-- <div title="Beschreibung" class="work-description"><span class="hint">Beschreibung:</span>{{workshop.description}}</div> -->
+                <!-- <div title="Ersteller" class="work-creator"><span class="hint">Erstellt von</span> {{workshop.creator}}</div> -->
+                <div title="Stimmen" class="work-votes">{{workshop.votes.length}} Stimmen</div>
+                <button class="delete-workshop workshop-button" onclick="confirmDeleteWorkshop(this)">Delete</button>
+                <button class="edit-workshop workshop-button" onclick="editWorkshop(this.parentElement)">Edit</button>
+            </div>
+
+            <span class="logout"><a href="/web/logout.html">Ausloggen</a></span>
+        </div>
+    </div>
+    <div id="inputbox" v-bind:class="{hidden: hideInput}">
+        <span onclick="closeInputbox()" id="closeInput">X</span>
+        <input type="text" id="topic" placeholder="Kategorie">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="description" placeholder="Beschreibung">
+        <button id="confirmInput" onclick="confirmInput()">Best&auml;tigen</button>
+    </div>
+    <script src="/scripts/manage.js"></script>
+</body>
+
+</html>

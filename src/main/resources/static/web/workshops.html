@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profil</title>
+
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/style/style.css" rel="stylesheet">
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/scripts/app.js"></script>
+</head>
+
+<body>
+    <noscript>
+        <h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+            enabled. Please enable
+            Javascript and reload this page!</h2>
+    </noscript>
+    <div id="content">
+        <table>
+            <tr>
+                <!-- Emtpy for the upper left corner -->
+                <td></td> 
+
+                <td v-for="room in status.rooms">
+                    {{room}}
+                </td>
+            </tr>
+            <tr v-for="(slot, index) in timetable.slots">
+                <td>{{index+1}}.: {{status.slots[index] }}</td>
+                <td v-for="workshop in slot.workshops" v-bind:id="workshop.id">
+                    <div title="Kategorie" class="work-category">{{workshop.topic}}</div>
+                    <div title="Name" class="work-name"> {{workshop.name}}</div>
+                    <div title="Beschreibung" class="work-description"> {{workshop.description}}</div>
+                    <div title="Ersteller" class="work-creator"> Erstellt von {{workshop.creator}}</div>
+                    <div title="Stimmen" class="work-votes"> {{workshop.votes.length}} Stimmen erhalten</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    </div>
+    </div>
+
+    <div id="loading">
+        <h1>Lade...</h1>
+    </div>
+    <script src="/scripts/workshops.js"></script>
+</body>
+
+</html>

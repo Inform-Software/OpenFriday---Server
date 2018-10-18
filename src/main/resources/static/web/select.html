@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpenFriday - Workshop-Auswahl</title>
+
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/style/style.css" rel="stylesheet">
+    <link href="/style/select.css" rel="stylesheet">
+
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/scripts/app.js"></script>
+</head>
+
+<body>
+    <noscript>
+        <h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+            enabled. Please enable
+            Javascript and reload this page!</h2>
+    </noscript>
+    <div id="content" class="vertical-content">
+        <div class="vertical-box">
+            <h1>Bitte w&auml;hle die Workshops aus, die dich interessieren!</h1>
+            <div v-for="(workshop, index) in workshops" v-bind:index="index" v-bind:id="workshop.id" v-bind:class="{selected: workshop.selected, workshop: true}"
+                onclick="handleClick(this)">
+                <div title="Name" class="work-name"><span class="hint">Name:</span> {{workshop.name}}</div>
+                <div title="Kategorie" class="work-category"><span class="hint">Kategorie:</span> {{workshop.topic}}</div>
+                <!-- <div title="Beschreibung" class="work-description"><span class="hint">Beschreibung:</span>{{workshop.description}}</div> -->
+                <!-- <div title="Ersteller" class="work-creator"><span class="hint">Erstellt von</span> {{workshop.creator}}</div> -->
+                <div title="Stimmen" class="work-votes">{{workshop.votes.length}} Stimmen</div>
+            </div>
+            <!--Hide confirm button until list is loaded -->
+            <!-- <button class="confirm" v-bind:class="{hidden: !(workshops.length > 0)}">Best&auml;tigen</button> -->
+
+            <span class="logout"><a href="/web/logout.html">Ausloggen</a></span>
+        </div>
+    </div>
+    <div id="loading">Lade...</div>
+    <script src="/scripts/select.js"></script>
+</body>
+
+</html>

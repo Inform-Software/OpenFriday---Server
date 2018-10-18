@@ -1,0 +1,39 @@
+/rest : Rest API
+  /status
+    GET: Status as JSON
+    PUT: Update Status
+  /timetable
+    GET: Get Timetable
+    /
+  /user
+    GET: Get all users
+    PUT: Add user
+    DELETE: Delete all users
+    /{id}
+      GET: Get user with {id}
+      PUT: Edit user with {id}
+      DELETE: Delete user with {id}
+      /enter/{workshopId}
+        GET: Enter Workshop with {workshopId}
+  /workshop
+    GET: Get all Workshops
+    PUT: Add workshop
+    POST: Edit Workshop(s)
+    DELETE: Delete all Workshops
+    /dummy
+      GET: Get an example workshop
+    /update
+      GET: Update all Workshops ( setValue(getValue()) )
+    /{id}
+      GET: Get Workshop with {id}
+      PUT: Edit Workshop with {id}
+      DELETE: Delete Workshop with {id}
+      /vote/{user}/{interest}
+        GET: Toggles the vote for a workshop
+
+
+/web : Webinterface
+  /index.html : Welcome Page / Login
+  /select.html : Vote Page
+  /manage.html: Managment Page (Add/Edit/Delete Workshops)
+  /logout.html: Log out the user (Clear cookie)

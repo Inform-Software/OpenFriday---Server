@@ -1,0 +1,179 @@
+body {
+    background-color: #0091A5;
+    color: white;
+}
+
+#loading {
+    position: absolute;
+    top: 0%;
+    bottom: 0%;
+    left: 0%;
+    right: 0%;
+    z-index: 10;
+    background-color: #0091A5;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+table tr {
+    color: black;
+    background-color: white;
+}
+
+table tr td {
+    border: 1px solid grey;
+    border-radius: 2%;
+    word-wrap: break-word;
+    overflow-y: auto;
+    width: 20%;
+    height: 20%;
+}
+
+.vertical-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    left: 0%;
+}
+
+.vertical-content input {
+    color: black;
+}
+
+.vertical-box {
+    margin: 25%;
+    width: 49%;
+    margin-top: 5%;
+    margin-bottom: 100px;
+    display: grid;
+    text-align: center;
+}
+
+@media only screen and (max-width: 1000px) {
+    .vertical-box {
+        margin: 10px;
+        margin-bottom: 0px;
+        width: 100%;
+    }
+}
+
+.vertical-box input {
+    width: 50%;
+    margin-left: 25%;
+    padding-left: 5px;
+}
+
+.hint {
+    color: #5A6E78;
+}
+
+.logout {
+    position: fixed;
+    bottom: 2%;
+    right: 2%;
+    z-index: 3;
+
+}
+
+.logout a {
+    color: #5A6E78;
+    text-decoration: underline;
+}
+
+button {
+    color: white;
+    background-color: #BECB00;
+    border-radius: 2%;
+    border: none;
+    transition: 0.5s;
+
+    margin-left: 35.5%;
+    width: 25%;
+}
+
+@media screen and (max-width: 1000px) {
+    #username {
+        margin-left: 0%;
+        width: 100%;
+    }
+
+    button {
+        margin-left: 0px;
+        width: 100%;
+    }
+}
+
+button:hover {
+    color: black;
+    background-color: white;
+    border: 1px solid #BECB00;
+}
+
+.hidden {
+    display: none;
+}
+
+.workshop {
+    margin-top: 10px;
+    background-color: white;
+    color: black;
+    text-align: left;
+    padding: 5px;
+    border-radius: 2%;
+    cursor: pointer;
+}
+
+@media screen and (min-width: 1000px) {
+    .workshop {
+        width: 50%;
+        margin-left: 25%;
+    }
+}
+
+.delete-workshop {
+    color: white;
+    background-color: #C00222;
+}
+
+.delete-workshop:hover {
+    color: #C00222;
+    background-color: white;
+    border: 1px solid #C00222;
+}
+
+#inputbox {
+    z-index: 9;
+
+    position: fixed;
+    left: 10%;
+    right: 10%;
+    top: 20%;
+    bottom: 20%;
+    background-color: white;
+    color: black;
+    display: grid;
+}
+
+#inputbox input {
+    padding-left: 5px;
+}
+
+#closeInput {
+    display: block;
+    float: right;
+    text-align: right;
+    width: auto;
+    color: #5A6E78;
+    cursor: pointer;
+    font-size: x-large;
+    margin-right: 5px;
+}
+
+#login {
+    margin-top: 30px;
+}

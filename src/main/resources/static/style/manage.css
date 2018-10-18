@@ -1,0 +1,16 @@
+#inputbox input {
+    margin: 5px;
+}
+
+#inputbox button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#inputbox {
+    background-color: #E4ECF0;
+}
+
+.workshop-button {
+    margin-top: 5px;
+}

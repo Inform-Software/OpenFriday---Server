@@ -1,0 +1,8 @@
+.selected {
+    background-color: #BECB00;
+    color: white;
+}
+
+.selected .hint {
+    color: black;
+}
