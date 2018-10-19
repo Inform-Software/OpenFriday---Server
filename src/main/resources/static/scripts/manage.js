@@ -4,7 +4,7 @@ var vm = new Vue({
     el: '#content',
     data: {
         workshops: "",
-        name: getCookie("name"),
+        name: getCookie("name").toLowerCase()
     },
     mounted() {
         refreshWorkshops();
@@ -16,7 +16,8 @@ var input = new Vue({
     data: {
         hideInput: true,
         intentIsCreate: true,
-        id: 0 
+        id: 0,
+        index: 0
     },
     mounted() {
         refreshWorkshops();
@@ -62,6 +63,7 @@ function deleteWorkshop(id) {
 function editWorkshop(element) {
     input.intentIsCreate = false;
     input.id = $(element).attr('id');
+    input.index = $(element).attr('index');
     input.hideInput = false;
 
     var index = $(element).attr('index');
@@ -84,7 +86,6 @@ function confirmInput() {
     var description = $("#description").val();
     var topic = $("#topic").val();
     if(input.intentIsCreate) {
-        console.log("Create!");
         axios
         .put("/rest/workshop", {
             name: name,
@@ -96,7 +97,6 @@ function confirmInput() {
             refreshWorkshops();
         })
     } else {
-        console.log("Edit")
         axios
         .put("/rest/workshop/" + input.id, {
             name: name,

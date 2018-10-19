@@ -10,8 +10,6 @@ var vm = new Vue({
         axios
         .get("/rest/status")
         .then(function(response) {
-            $("#loading").fadeOut();
-            console.log(response.data);
             vm.status = response.data;
         });
 
@@ -19,7 +17,6 @@ var vm = new Vue({
         .get("/rest/timetable")
         .then(function(response) {
             $("#loading").fadeOut();
-            console.log(response.data);
             vm.timetable = response.data;
         });
     }

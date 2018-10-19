@@ -16,7 +16,7 @@ public class Workshop {
   @GeneratedValue
   private Long       id;                            // The ID of the Workshop
   private List<Vote> votes    = new ArrayList<> (); // Votes the workshop received
-  private String     creator;                       // The User who created the Workshop
+  private String     creator;                       // The User who last edited the Workshop
   private String     topic;                         // The topic of the Workshop
   private String     name;                          // The name of the Workshop
   private String     description;                   // The description of the Workshop
@@ -75,6 +75,7 @@ public class Workshop {
   }
 
   private static Workshop dummy;
+  private static Workshop empty;
 
   public static Workshop getDummy () {
     if (dummy == null) { // Initialize if not done yet
@@ -86,6 +87,16 @@ public class Workshop {
       // dummy.addVote (5l);
     }
     return dummy;
+  }
+
+  public static Workshop getEmpty () {
+    if (empty == null) {
+      empty = new Workshop ();
+      empty.setCreator ("");
+      empty.setName ("");
+      empty.setTopic ("");
+    }
+    return empty;
   }
 
   @Override

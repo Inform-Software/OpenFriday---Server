@@ -1,5 +1,8 @@
 package com.syncrotess.openfriday.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -52,6 +55,23 @@ public class Timetable {
       roomWorkshops[i] = slots[i].getWorkshopInRoom (roomIndex);
     }
     return roomWorkshops;
+  }
+
+  public Timetable addAll (Iterable<Workshop> iterable) {
+    List<Workshop> list = new ArrayList<> ();
+    iterable.forEach (list::add);
+    int added = 0;
+    System.out.println ("List size: " + list.size ());
+    for (int slot = 0; slot < slotAmount; slot++) {
+      for (int room = 0; room < roomAmount; room++) {
+        if (added == list.size ()) {
+          break;
+        }
+        slots[slot].setWorkshopInRoom (room, list.get (added));
+        added++;
+      }
+    }
+    return this;
   }
 
   @Override

@@ -1,6 +1,7 @@
 package com.syncrotess.openfriday.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ import com.syncrotess.openfriday.util.Timetable;
 import com.syncrotess.openfriday.util.User;
 import com.syncrotess.openfriday.util.Vote;
 import com.syncrotess.openfriday.util.Workshop;
+import com.syncrotess.openfriday.util.WorkshopComparator;
 
 @org.springframework.stereotype.Controller
 public class Controller {
@@ -37,6 +39,7 @@ public class Controller {
   @Autowired
   VoteRepository                                   voterepo;
   Status                                           status = new Status ();
+  Timetable                                        timetable;
 
   @RequestMapping (value = "/rest/status")
   @ResponseBody
@@ -54,30 +57,16 @@ public class Controller {
   @ResponseBody
   public ResponseEntity<Status> editStatus (@RequestBody Status status) {
     this.status = status;
+    this.timetable = new Timetable (status.getSlots ().length, status.getRooms ().length);
     return new ResponseEntity<> (this.status, HttpStatus.OK);
   }
-
-//  @RequestMapping (value = "/workshop/getmy")
-//  @ResponseBody
-//  public ResponseEntity<Workshop[]> getMyWorkshop (@RequestParam (value = "name") String name) {
-//
-//    // if (persid == workshop.get (id).getpersid ()) { return workshop.get (id);
-//    HashMap<Integer, Integer> map = users.get (name).getMyworkshops ();
-//    int anzwork = users.get (name).getAnzwork ();
-//    Workshop[] work = new Workshop[anzwork];
-//    int x;
-//    for (int i = 0; i < anzwork; i++) {
-//      x = map.get (i);
-//      work[i] = workshop.get (x);
-//    }
-//
-//    return new ResponseEntity<Workshop[]> (work, HttpStatus.OK);
-//  }
 
   @RequestMapping (value = "/rest/timetable", produces = "application/json")
   @ResponseBody
   public ResponseEntity<String> getTimetable () {
-    Timetable timetable = new Timetable (status.getSlots ().length, status.getRooms ().length);
+    if (timetable == null) {
+      timetable = new Timetable (status.getSlots ().length, status.getRooms ().length);
+    }
     return new ResponseEntity<> (timetable.toString (), HttpStatus.OK);
   }
 
@@ -174,6 +163,17 @@ public class Controller {
     return new ResponseEntity<> (works, HttpStatus.OK);
   }
 
+  @RequestMapping (value = "/rest/workshop/sorted")
+  @ResponseBody
+  public ResponseEntity<Iterable<Workshop>> getAllWorkshopsSorted () {
+    Iterable<Workshop> it = workrepo.findAll ();
+    List<Workshop> workshops = new ArrayList<> ();
+    it.forEach (workshops::add);
+    // TODO: List is not sorted properly
+    Collections.sort (workshops, new WorkshopComparator ());
+    return new ResponseEntity<> (workshops, HttpStatus.OK);
+  }
+
   @RequestMapping (value = "/rest/workshop", method = RequestMethod.PUT)
   @ResponseBody
   public ResponseEntity<Workshop> addWorkshop (@RequestBody Workshop work) {
@@ -259,7 +259,7 @@ public class Controller {
       work1.setName (work.getName ());
       work1.setTopic (work.getTopic ());
       work1.setCreator (work.getCreator ());
-      work1.setVotes (work.getVotes ());
+      // Votes are not edited. Use /vote/{user}/{interest} or /vote/clear!
       workrepo.save (work1);
       return new ResponseEntity<Workshop> (work1, HttpStatus.OK);
     } else {
@@ -285,6 +285,7 @@ public class Controller {
   public ResponseEntity<Iterable<Workshop>> toggleVoteForWorkshop (@PathVariable ("id") long id,
                                                                    @PathVariable ("user") String user,
                                                                    @PathVariable ("interest") int interest) {
+    user = user.toLowerCase ();
     Optional<Workshop> result = workrepo.findById (id);
     if (result.isPresent ()) {
       Workshop work = result.get ();

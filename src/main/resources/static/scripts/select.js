@@ -4,7 +4,7 @@ var vm = new Vue({
     el: '#content',
     data: {
         workshops: "",
-        name: getCookie("name")
+        name: getCookie("name").toLowerCase()
     },
     mounted() {
         axios
@@ -19,7 +19,6 @@ var vm = new Vue({
 
 function handleClick(element) {
     var url = "/rest/workshop/" + $(element).attr('id') + "/vote/" + vm.name + "/1";
-    console.log(url);
     axios
     .get(url)
     .then(function (response) {
