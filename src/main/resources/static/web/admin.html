@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style/style.css">
+
+    <!-- The following 3 scripts are needed for additional bootstrap components -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/scripts/fontawesome.js"></script>
+    <script src="/scripts/jquery.md5.js"></script>
+    <script src="/scripts/util.js"></script>
+
+    <title>Open Friday - Admin</title>
+</head>
+<body>
+    <div class="container-fluid" id="content">
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6 horizontal-centered logo">
+                <img src="https://i.ibb.co/N99n7r6/Screenshot-2019-10-18-Make-A-High-Quality-Logo-In-Just-5-Minutes-For-Under-30.png" alt="Logo des OpenFriday">
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6 jumbotron">
+                <div class="row">
+                    <div class="col horizontal-centered-text">
+                        INFOS
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Planung ver&ouml;ffentlicht: nein
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Anzahl Workshops: {{workshopAmount}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6">
+                <a href="/web/start.html" class="btn btn-danger btn-lg btn-block">Zur&uuml;ck</a>
+                <a href="" class="btn btn-primary btn-lg btn-block disabledDiv">Planung verwalten</a>
+                <a href="" class="btn btn-primary btn-lg btn-block disabledDiv">Zeitslots und R&auml;ume verwalten</a>
+                <a href="/web/adminUserManagement.html" class="btn btn-primary btn-lg btn-block">Admin Nutzer verwalten</a>
+            </div>
+        </div>
+        <div class="row justify-content-center" v-bind:class="{disabledDiv: username === 'admin'}">
+            <div class="col-10 col-md-6 jumbotron">
+                <h5 class="horizontal-centered-text">Passwort &auml;ndern</h5>
+                <p class="text-danger" v-if="errorMessage">{{errorMessage}}</p>
+                <p class="text-success" v-if="successMessage">{{successMessage}}</p>
+                <form v-on:submit.prevent="changePassword()">
+                    <div class="form-group">
+                        <label for="currentPassword">Aktuelles Passwort:</label>
+                        <input type="password" class="form-control" id="currentPassword" v-model="currentPassword" v-bind:tabindex="username === 'admin'? -1 : 0">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Neues Passwort:</label>
+                        <input type="password" class="form-control" id="newPassword" v-model="newPassword" v-bind:tabindex="username === 'admin'? -1 : 0">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPasswordAgain">Neues Passwort wiederholen:</label>
+                        <input type="password" class="form-control" id="newPasswordAgain" v-model="newPasswordAgain" v-bind:tabindex="username === 'admin'? -1 : 0">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" v-bind:tabindex="username === 'admin'? -1 : 0">Passwort &auml;ndern</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/scripts/admin.js"></script>
+</body>
+</html>

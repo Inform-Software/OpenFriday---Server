@@ -1,0 +1,122 @@
+.horizontal-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.horizontal-centered-text {
+    text-align: center;
+}
+
+.logo {
+    margin-bottom: 50px;
+}
+
+.user-icon {
+    width: 2em !important;
+    height: 2em !important;
+    border: solid black;
+    border-radius: 5em;
+    padding: .2em;
+}
+
+.btn:not(.btn-link.btn-outline-*) {
+    color: white !important;
+}
+
+.btn-primary {
+    background-color: #0091a5 !important;
+}
+
+.jumbotron {
+    background-color: #e1e1e1;
+    margin-top: 2rem;
+    padding: 1rem !important;
+}
+
+.workshop-prio-high {
+    background-color: #7ab51d !important;
+}
+
+.workshop-prio-low {
+    background-color: #fabb00 !important;
+}
+
+textarea {
+    resize: none;
+}
+
+@media screen and (max-width: 768px) {
+    button a.btn {
+        margin-left: 0;
+        width: 100%;
+        margin-bottom: 2vh;
+        margin-top: 2vh;
+    }
+
+    .popup-box {
+        left: 2.5% !important;
+        width: 95% !important;
+    }
+}
+
+@media screen and (max-height: 700px) {
+    .popup-box {
+        position: absolute !important;
+    }
+}
+
+.popup-box {
+    z-index: 9;
+    position: fixed;
+    left:25%;
+    top: 100px;
+    bottom: 20%;
+    color: black;
+    display: grid;
+    width: 50%;
+    height: 60%;
+    min-height: 420px;
+    border: 1px solid grey;
+    text-align: Left;
+    background-color: #E4ECF0;
+    padding: 5px;
+}
+
+#workshop-box {
+    min-height: 600px;
+}
+
+#admin-box {
+    min-height: 450px;
+}
+
+.box-header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.close-input {
+    float: right;
+    width: auto;
+    margin-top: 0 !important;
+}
+
+.disabledDiv {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.workshop-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.workshop-footer {
+    font-size: 1.5rem;
+}
+
+.workshop, .admin-jumbotron {
+    margin-bottom: .5em;
+    margin-top: .5em;
+}

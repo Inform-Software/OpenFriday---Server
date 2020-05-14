@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style/style.css">
+
+    <!-- The following 3 scripts are needed for additional bootstrap components -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/scripts/fontawesome.js"></script>
+    <script src="/scripts/jquery.md5.js"></script>
+    <script src="/scripts/util.js"></script>
+
+    <title>Open Friday - User Management</title>
+</head>
+<body>
+<div class="container-fluid" id="content">
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6 horizontal-centered logo">
+            <img src="https://i.ibb.co/N99n7r6/Screenshot-2019-10-18-Make-A-High-Quality-Logo-In-Just-5-Minutes-For-Under-30.png" alt="Logo des OpenFriday">
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6">
+            <a href="/web/admin.html" class="btn btn-danger btn-lg btn-block">Zur&uuml;ck</a>
+            <button class="btn btn-primary btn-lg btn-block" onclick="toggleAdminBox()">Admin Nutzer hinzuf&uuml;gen</button>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6">
+            <div class="row" v-for="admin in allAdmins">
+                <div class="col jumbotron admin-jumbotron">
+                    <div class="row">
+                        <div class="col">
+                            {{admin.name}}
+                        </div>
+                        <div class="col" v-if="admin.name !== username && admin.name !== 'admin'">
+                            <button class="btn btn-danger btn-block" v-on:click="deleteAdmin(admin.id)">L&ouml;schen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------------- Popup Boxes ----------------- -->
+
+<div class="container">
+    <div class="popup-box" id="admin-box" v-if="isVisible">
+        <div class="row justify-content-center">
+            <div class="col box-header">
+                Admin hinzuf&uuml;gen
+                <button type="button" class="btn btn-outline-danger close-input" onclick="toggleAdminBox()">X</button>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <span class="text-danger">{{errormessage}}</span>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <form v-on:submit.prevent="addAdmin()">
+                    <div class="form-group">
+                        <label for="admin-name">Name:</label>
+                        <input type="text" id="admin-name" class="form-control" v-model="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Passwort:</label>
+                        <input type="password" id="password" class="form-control" v-model="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="password-again">Passwort wiederholen:</label>
+                        <input type="password" id="password-again" class="form-control" v-model="passwordAgain">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Best&auml;tigen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/scripts/adminUserManagement.js"></script>
+</body>
+</html>

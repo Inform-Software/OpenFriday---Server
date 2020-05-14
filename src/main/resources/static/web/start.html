@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style/style.css">
+
+    <!-- The following 3 scripts are needed for additional bootstrap components -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/scripts/fontawesome.js"></script>
+    <script src="/scripts/util.js"></script>
+
+    <title>Open Friday - Startseite</title>
+</head>
+<body>
+    <div class="container-fluid" id="content" v-bind:class="{disabledDiv: isDisabled}">
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6 horizontal-centered logo">
+                <img src="https://i.ibb.co/N99n7r6/Screenshot-2019-10-18-Make-A-High-Quality-Logo-In-Just-5-Minutes-For-Under-30.png" alt="Logo des OpenFriday">
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6 horizontal-centered-text jumbotron">
+                <div v-show="admin">
+                    <i class="fas fa-user-crown user-icon"></i>
+                </div>
+                <div v-show="!admin">
+                    <i class="fas fa-user user-icon"></i>
+                </div>
+                Angemeldet als: {{username}}
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6">
+                <button class="btn btn-danger btn-lg btn-block" onclick="logout()">Abmelden</button>
+                <button class="btn btn-primary btn-lg btn-block" v-if="admin" onclick="window.location.href = '/web/admin.html'">Adminfunktionen</button>
+                <button class="btn btn-primary btn-lg btn-block disabledDiv">Planung anzeigen</button>
+                <button class="btn btn-primary btn-lg btn-block" onclick="toggleWorkshopBox()">Neuen Workshop anlegen</button>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6 horizontal-centered-text jumbotron">
+                <h5>W&auml;hle deine Zeitslots.</h5>
+                <small>Deine &Auml;nderungen werden direkt &uuml;bernommen.</small>
+                <br />
+                <form v-on:submit.prevent="saveUserSlots()">
+                    <div v-for="slot in slots">
+                        <div class="row">
+
+<!--                            <div class="col">
+                                <label class="form-check-label" v-bind:for="slot.id">
+                                    {{slot.name}}
+                                </label>
+                            </div>-->
+                            <div class="col">
+<!--                                <input class="form-check-input" type="checkbox" name="time-slot" v-bind:id="slot.id">-->
+                                <div class="custom-control custom-switch form-control-lg">
+                                    <input type="checkbox" class="custom-control-input" name="time-slot" v-bind:id="slot.id" v-on:change="saveUserSlots()">
+                                    <label class="custom-control-label" v-bind:for="slot.id">{{slot.name}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+<!--                    <button class="btn btn-primary btn-lg btn-block" style="margin-top: 1rem" type="submit">Zeiten speichern</button>-->
+                </form>
+
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6">
+                <h5 class="horizontal-centered-text">Workshops</h5>
+                <p>
+                    Lege durch mehrfaches Antippen eines Workshops dein Interesse daran fest. Deine &Auml;nderungen werden direkt &uuml;bernommen.
+                </p>
+                <p>
+                    <span style="color: #7ab51d">&block;</span> Ich nehme auf jeden Fall teil<br>
+                    <span style="color: #fabb00">&block;</span> Ich nehme teil, wenn es zeitlich passt<br>
+                    <span style="color: #e1e1e1">&block;</span> Ich nehme nicht teil (Standard)<br>
+                </p>
+            </div>
+        </div>
+
+        <div v-for="workshop in workshops">
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-6 jumbotron workshop" v-on:click="voteForWorkshop(workshop)"
+                    v-bind:class="{ 'workshop-prio-high': votes.has(workshop.id) && votes.get(workshop.id) === 2,
+                                    'workshop-prio-low': votes.has(workshop.id) && votes.get(workshop.id) === 1}">
+                    <div class="row">
+                        <div class="col workshop-header">
+                            {{workshop.name}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{workshop.slots.map(slot => slot.name.split('-')[0].trim()).join(" / ")}}
+                        </div>
+                    </div>
+                    <div class="row" v-if="workshop.creator === username || admin">
+                        <div class="col-6">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-primary btn-sm" v-on:click.stop="openEditBox(workshop)">Bearbeiten</button>
+                                <button type="button" class="btn btn-danger" v-on:click.stop="deleteWorkshop(workshop)">L&ouml;schen</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            Beschreibung: {{workshop.description}}
+                        </div>
+                    </div>
+                    <div class="row workshop-footer">
+                        <div class="col-10">
+                            {{workshop.creator}}
+                        </div>
+                        <div class="col-2">
+                            {{workshop.votesHigh + workshop.votesLow}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ---------------- Popup Boxes ----------------- -->
+    <div class="container">
+        <div class="popup-box" id="workshop-box" v-if="isVisible">
+            <div class="row justify-content-center">
+                <div class="col box-header">
+                    <div v-if="editing">Workshop bearbeiten</div>
+                    <div v-else>Neuen Workshop anlegen</div>
+                    <button type="button" class="btn btn-outline-danger close-input" onclick="toggleWorkshopBox()">X</button>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <span class="text-danger">{{errormessage}}</span>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <form v-on:submit.prevent="addWorkshop()">
+                        <div class="form-group">
+                            <label for="workshop-name">Name des Workshops:</label>
+                            <input type="text" id="workshop-name" class="form-control" v-model="workshopName">
+                        </div>
+                        <div class="form-group">
+                            <label for="workshop-description">Beschreibung des Workshops:</label>
+                            <textarea class="form-control" rows="5" id="workshop-description" v-model="workshopDescription"></textarea>
+                        </div>
+                        <p>
+                            Bitte w&auml;hle die Zeiten, in denen du diesen Workshop anbieten m&ouml;chtest:
+                        </p>
+                        <div v-for="slot in slots">
+                            <div class="row justify-content-center">
+                                <div class="col">
+                                    <label class="form-check-label" v-bind:for="'w:' + slot.id">
+                                        {{slot.name}}
+                                    </label>
+                                </div>
+                                <div class="col horizontal-centered-text">
+                                    <input class="form-check-input" type="checkbox" name="time-slot-w" v-bind:id="'w:' + slot.id">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">Best&auml;tigen</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/scripts/start.js"></script>
+</body>
+</html>
