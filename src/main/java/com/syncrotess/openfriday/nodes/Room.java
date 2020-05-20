@@ -5,22 +5,21 @@ import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class Slot implements Serializable {
+public class Room implements Serializable {
 
     @JsonView(Views.Public.class)
     private UUID id;
     @JsonView(Views.Public.class)
     private String name;
+    @JsonView(Views.Public.class)
+    private int size;
+    @JsonView(Views.Public.class)
+    private Slot[] slots;
 
-    public Slot() {}
-
-    public Slot(String name) {
-        id = UUID.randomUUID();
-        this.name = name;
-    }
+    public Room() {}
 
     public void setId() {
-        this.id = UUID.randomUUID();
+        id = UUID.randomUUID();
     }
 
     public void setId(UUID id) {
@@ -35,9 +34,15 @@ public class Slot implements Serializable {
         return name;
     }
 
-    public Slot setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
+    public Slot[] getSlots() {
+        return slots;
+    }
+
+    public void setSlots(Slot[] slots) {
+        this.slots = slots;
+    }
 }

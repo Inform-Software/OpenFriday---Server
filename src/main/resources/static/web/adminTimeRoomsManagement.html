@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style/style.css">
+
+    <!-- The following 3 scripts are needed for additional bootstrap components -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/scripts/fontawesome.js"></script>
+    <script src="/scripts/jquery.md5.js"></script>
+    <script src="/scripts/util.js"></script>
+
+    <title>Open Friday - Zeit und Raum Management</title>
+</head>
+<body>
+<div class="container-fluid" id="content" v-bind:class="{disabledDiv: isDisabled}">
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6 horizontal-centered logo">
+            <img src="https://i.ibb.co/N99n7r6/Screenshot-2019-10-18-Make-A-High-Quality-Logo-In-Just-5-Minutes-For-Under-30.png" alt="Logo des OpenFriday">
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6">
+            <a href="/web/admin.html" class="btn btn-danger btn-lg btn-block">Zur&uuml;ck</a>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6 paragraph-header">
+            <h5 class="horizontal-centered-text">Zeitslots verwalten</h5>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6">
+            <button class="btn btn-primary btn-lg btn-block" onclick="toggleSlotBox()">Zeitslot hinzuf&uuml;gen</button>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6" v-if="!slots.length">
+            <h6 class="horizontal-centered-text">Noch keine Slots vorhanden.</h6>
+        </div>
+        <div class="col-10 col-md-6" v-else>
+            <div class="row" v-for="slot in slots">
+                <div class="col jumbotron admin-jumbotron">
+                    <div class="row">
+                        <div class="col">
+                            Zeit: {{slot.name}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn btn-primary btn-block " v-on:click="editSlot(slot)">Bearbeiten</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-danger btn-block " v-on:click="deleteSlot(slot)">L&ouml;schen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6 paragraph-header">
+            <h5 class="horizontal-centered-text">R&auml;ume verwalten</h5>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6">
+            <button class="btn btn-primary btn-lg btn-block" onclick="toggleRoomBox()">Raum hinzuf&uuml;gen</button>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6" v-if="!rooms.length">
+            <h6 class="horizontal-centered-text">Noch keine R&auml;ume vorhanden.</h6>
+        </div>
+        <div class="col-10 col-md-6" v-else>
+            <div class="row" v-for="room in rooms">
+                <div class="col jumbotron admin-jumbotron">
+                    <div class="row">
+                        <div class="col">
+                            Name: {{room.name}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            Zeiten: {{room.slots.map(slot => slot.name.split('-')[0].trim()).join(" / ")}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            Gr&ouml;ße: {{room.size}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn btn-primary btn-block " v-on:click="editRoom(room)">Bearbeiten</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-danger btn-block " v-on:click="deleteRoom(room)">L&ouml;schen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------------- Popup Boxes ----------------- -->
+
+<div class="container">
+    <!-- Slot box -->
+    <div class="popup-box" id="slot-box" v-if="isVisible">
+        <div class="row justify-content-center">
+            <div class="col box-header">
+                <div v-if="editing">Slot bearbeiten</div>
+                <div v-else>Neuen Slot anlegen</div>
+                <button type="button" class="btn btn-outline-danger close-input" onclick="toggleSlotBox()">X</button>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <span class="text-danger">{{errormessage}}</span>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <form v-on:submit.prevent="addSlot()">
+                    <div class="form-group">
+                        <label for="slot-name">Name (in der Form <i>8:15 - 12:45</i>):</label>
+                        <input type="text" id="slot-name" class="form-control" v-model="name">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Best&auml;tigen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room box -->
+    <div class="popup-box" id="room-box" v-if="isVisible">
+        <div class="row justify-content-center">
+            <div class="col box-header">
+                <div v-if="editing">Raum bearbeiten</div>
+                <div v-else>Neuen Raum anlegen</div>
+                <button type="button" class="btn btn-outline-danger close-input" onclick="toggleRoomBox()">X</button>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <span class="text-danger">{{errormessage}}</span>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <form v-on:submit.prevent="addRoom()">
+                    <div class="form-group">
+                        <label for="room-name">Name:</label>
+                        <input type="text" id="room-name" class="form-control" v-model="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="room-size">Gr&ouml;&szlig;e</label>
+                        <input type="number" id="room-size" class="form-control" v-model="size">
+                    </div>
+                    <div v-for="slot in slots">
+                        <div class="row justify-content-center">
+                            <div class="col">
+                                <label class="form-check-label" v-bind:for="slot.id">
+                                    {{slot.name}}
+                                </label>
+                            </div>
+                            <div class="col horizontal-centered-text">
+                                <input class="form-check-input" type="checkbox" name="time-slot" v-bind:id="slot.id">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Best&auml;tigen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/scripts/adminTimeRoomsManagement.js"></script>
+</body>
+</html>

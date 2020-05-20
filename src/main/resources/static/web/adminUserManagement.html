@@ -25,7 +25,7 @@
     <title>Open Friday - User Management</title>
 </head>
 <body>
-<div class="container-fluid" id="content">
+<div class="container-fluid" id="content" v-bind:class="{disabledDiv: isDisabled}">
     <div class="row justify-content-center">
         <div class="col-10 col-md-6 horizontal-centered logo">
             <img src="https://i.ibb.co/N99n7r6/Screenshot-2019-10-18-Make-A-High-Quality-Logo-In-Just-5-Minutes-For-Under-30.png" alt="Logo des OpenFriday">
@@ -45,7 +45,7 @@
                         <div class="col">
                             {{admin.name}}
                         </div>
-                        <div class="col" v-if="admin.name !== username && admin.name !== 'admin'">
+                        <div class="col" v-bind:class="{'disabledDiv': admin.name === username || admin.name === 'admin'}">
                             <button class="btn btn-danger btn-block" v-on:click="deleteAdmin(admin.id)">L&ouml;schen</button>
                         </div>
                     </div>

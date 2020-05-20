@@ -1,23 +1,23 @@
 package com.syncrotess.openfriday.repository;
 
+import com.syncrotess.openfriday.nodes.Room;
 import com.syncrotess.openfriday.nodes.Slot;
 
 import java.io.*;
 import java.util.*;
 
-public class SlotRepository {
-
+public class RoomRepository {
     private final String file;
-    private HashMap<UUID, Slot> repo;
+    private HashMap<UUID, Room> repo;
 
-    public SlotRepository(String pathToFile) {
+    public RoomRepository(String pathToFile) {
         file = pathToFile;
     }
 
     private void loadFile() {
         try {
             ObjectInputStream is = new ObjectInputStream(new FileInputStream(file));
-            repo = (HashMap<UUID, Slot>) is.readObject();
+            repo = (HashMap<UUID, Room>) is.readObject();
             is.close();
         } catch (FileNotFoundException e) {
             repo = new HashMap<>();
@@ -37,40 +37,29 @@ public class SlotRepository {
         }
     }
 
-    public void addSlot(Slot slot) {
+    public void addRoom(Room room) {
         loadFile();
-        slot.setId();
-        repo.put(slot.getId(), slot);
+        room.setId();
+        repo.put(room.getId(), room);
         saveFile();
     }
 
-    public void updateSlot(UUID id, Slot slot) {
+    public void updateRoom(UUID id, Room room) {
         loadFile();
-        repo.replace(id, slot);
+        repo.replace(id, room);
         saveFile();
     }
 
-    public void deleteSlot(UUID id) {
+    public void deleteRoom(UUID id) {
         loadFile();
         repo.remove(id);
         saveFile();
     }
 
-    public Slot findSlot(UUID id) {
+    public Collection<Room> getAllRooms() {
         loadFile();
-        return repo.get(id);
-    }
-
-    public boolean isEmpty() {
-        loadFile();
-        return repo.isEmpty();
-    }
-
-    public Collection<Slot> getAllSlots() {
-        loadFile();
-        List<Slot> list = new ArrayList<>(repo.values());
-        list.sort(Comparator.comparing(Slot::getName));
+        List<Room> list = new ArrayList<>(repo.values());
+        list.sort(Comparator.comparing(Room::getName));
         return list;
     }
-
 }

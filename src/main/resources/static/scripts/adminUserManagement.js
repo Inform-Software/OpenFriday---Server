@@ -39,7 +39,8 @@ let content = new Vue({
     el: "#content",
     data: {
         allAdmins: "",
-        username: username
+        username: username,
+        isDisabled: false
     },
     mounted() {
         axios
@@ -103,4 +104,5 @@ function toggleAdminBox() {
     adminBox.password = "";
     adminBox.passwordAgain = "";
     adminBox.isVisible = !adminBox.isVisible;
+    content.isDisabled = !content.isDisabled;
 }

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style/style.css">
+
+    <!-- The following 3 scripts are needed for additional bootstrap components -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/scripts/fontawesome.js"></script>
+    <script src="/scripts/util.js"></script>
+
+    <title>Open Friday - Planung (Admin)</title>
+</head>
+<body>
+<div class="container-fluid" id="content">
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6 horizontal-centered logo">
+            <img src="https://i.ibb.co/N99n7r6/Screenshot-2019-10-18-Make-A-High-Quality-Logo-In-Just-5-Minutes-For-Under-30.png" alt="Logo des OpenFriday">
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6">
+            <a href="/web/admin.html" class="btn btn-danger btn-lg btn-block">Zur&uuml;ck</a>
+            <button class="btn btn-primary btn-lg btn-block disabledDiv">Planung optimieren</button>
+            <button class="btn btn-primary btn-lg btn-block disabledDiv">Planung ver&ouml;ffentlichen</button>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <div class="table-responsive">
+                <table id="table" class="table table-bordered">
+                    <caption>Hinweis: Das manuelle Bearbeiten mittels Drag and Drop funktioniert nicht mit Touch Eingabe.</caption>
+                    <thead>
+                    <tr>
+                        <th style="width: 20%"></th>
+                        <th scope="col" style="text-align: center; max-width: 20%" v-for="room in rooms">{{room.name}}<br><small>{{room.size}}</small></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="slot in slots">
+                        <th scope="row">{{slot.name}}</th>
+                        <td v-for="room in rooms" v-bind:id="slot.id + ':' + room.id" ondragover="event.preventDefault();" ondrop="dropInTable(event)">
+                            <div v-if="plan.get(slot.id).has(room.id)" v-bind:id="plan.get(slot.id).get(room.id)" draggable="true" ondragstart="dragFromTable(event)">
+                                <div class="jumbotron table-content">
+                                    <div class="row">
+                                        <div class="col">
+                                            <b>{{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].name}}</b>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].slots.map(slot => slot.name.split('-')[0].trim()).join(" / ")}}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            Creator: {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].creator}}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            Stimmen: {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].votesHigh + workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].votesLow}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-6 jumbotron" ondragover="event.preventDefault();" ondrop="dropInList(event)">
+            <h5>Aussortierte Workshops</h5>
+            <small>Diese Workshops werden bei der Optimierung der Planung nicht ber&uuml;cksichtigt.<br>
+            Workshops aus der Tabelle hier hin ziehen, um sie auszusortieren.</small>
+        </div>
+    </div>
+    <div v-for="workshop in unusedWorkshops">
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6 jumbotron workshop" v-bind:id="workshop.id" draggable="true" ondragstart="dragFromList(event)">
+                <div class="row">
+                    <div class="col workshop-header">
+                        {{workshop.name}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{workshop.slots.map(slot => slot.name.split('-')[0].trim()).join(" / ")}}
+                    </div>
+                </div>
+<!--                    <div class="row">-->
+<!--                        <div class="col">-->
+<!--                            Beschreibung: {{workshop.description}}-->
+<!--                        </div>-->
+<!--                    </div>-->
+                <div class="row workshop-footer">
+                    <div class="col-10">
+                        {{workshop.creator}}
+                    </div>
+                    <div class="col-2">
+                        {{workshop.votesHigh + workshop.votesLow}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------------- Popup Boxes ----------------- -->
+
+<script src="/scripts/adminPlan.js"></script>
+</body>
+</html>

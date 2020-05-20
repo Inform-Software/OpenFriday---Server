@@ -2,6 +2,7 @@ package com.syncrotess.openfriday.core;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.syncrotess.openfriday.nodes.*;
+import com.syncrotess.openfriday.repository.RoomRepository;
 import com.syncrotess.openfriday.repository.SlotRepository;
 import com.syncrotess.openfriday.repository.UserRepository;
 import com.syncrotess.openfriday.repository.WorkshopRepository;
@@ -22,12 +23,10 @@ public class Controller {
     @Autowired
     private SimpMessagingTemplate template;
 
-    final
-    UserRepository userRepository;
-    final
-    SlotRepository slotRepository;
-    final
-    WorkshopRepository workshopRepository;
+    final UserRepository userRepository;
+    final SlotRepository slotRepository;
+    final WorkshopRepository workshopRepository;
+    final RoomRepository roomRepository;
 
     /**
      * Constructor for Controller. Links the repositories and creates the standard admin user.
@@ -51,6 +50,7 @@ public class Controller {
         }
 
         this.workshopRepository = new WorkshopRepository("workshoprepository.ofa");
+        this.roomRepository = new RoomRepository("roomrepository.ofa");
     }
 
     /**
@@ -292,6 +292,7 @@ public class Controller {
     @RequestMapping("/rest/slot/add")
     public ResponseEntity<Void> addSlot(@RequestBody Slot slot) {
         slotRepository.addSlot(slot);
+        template.convertAndSend("/topic/slots", slotRepository.getAllSlots());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -305,6 +306,7 @@ public class Controller {
     @ResponseBody
     public ResponseEntity<Boolean> editSlot(@PathVariable ("slotID") UUID id, @RequestBody Slot newSlot) {
         slotRepository.updateSlot(id, newSlot);
+        template.convertAndSend("/topic/slots", slotRepository.getAllSlots());
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
@@ -316,6 +318,7 @@ public class Controller {
     @ResponseBody
     public ResponseEntity<Void> deleteSlot(@PathVariable ("id") UUID id) {
         slotRepository.deleteSlot(id);
+        template.convertAndSend("/topic/slots", slotRepository.getAllSlots());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -327,6 +330,53 @@ public class Controller {
     @ResponseBody
     public ResponseEntity<Collection<Slot>> getSlots() {
         return new ResponseEntity<>(slotRepository.getAllSlots(), HttpStatus.OK);
+    }
+
+    /**
+     * Adds a new room
+     * @param room the room to be added
+     */
+    @RequestMapping("/rest/room/add")
+    public ResponseEntity<Void> addRoom(@RequestBody Room room) {
+        roomRepository.addRoom(room);
+        template.convertAndSend("/topic/rooms", roomRepository.getAllRooms());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Updates the room with the given id to the new room. The id of the given room is not changed, so it should be the same as the given id
+     * @param id the id of the room to be updated
+     * @param newRoom the new room
+     * @return true
+     */
+    @RequestMapping("/rest/room/edit/{roomID}")
+    @ResponseBody
+    public ResponseEntity<Void> editRoom(@PathVariable ("roomID") UUID id, @RequestBody Room newRoom) {
+        roomRepository.updateRoom(id, newRoom);
+        template.convertAndSend("/topic/rooms", roomRepository.getAllRooms());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Deletes a room.
+     * @param id the id of the room to delete
+     */
+    @RequestMapping("/rest/room/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> deleteRoom(@PathVariable ("id") UUID id) {
+        roomRepository.deleteRoom(id);
+        template.convertAndSend("/topic/rooms", roomRepository.getAllRooms());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Returns all saved rooms
+     * @return All rooms
+     */
+    @RequestMapping("/rest/room/getall")
+    @ResponseBody
+    public ResponseEntity<Collection<Room>> getRooms() {
+        return new ResponseEntity<>(roomRepository.getAllRooms(), HttpStatus.OK);
     }
 
     /**
