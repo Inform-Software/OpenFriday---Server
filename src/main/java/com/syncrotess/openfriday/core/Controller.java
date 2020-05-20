@@ -1,11 +1,9 @@
 package com.syncrotess.openfriday.core;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.syncrotess.openfriday.nodes.*;
-import com.syncrotess.openfriday.repository.RoomRepository;
-import com.syncrotess.openfriday.repository.SlotRepository;
-import com.syncrotess.openfriday.repository.UserRepository;
-import com.syncrotess.openfriday.repository.WorkshopRepository;
+import com.syncrotess.openfriday.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +25,7 @@ public class Controller {
     final SlotRepository slotRepository;
     final WorkshopRepository workshopRepository;
     final RoomRepository roomRepository;
+    final PlanRepository planRepository;
 
     /**
      * Constructor for Controller. Links the repositories and creates the standard admin user.
@@ -51,6 +50,7 @@ public class Controller {
 
         this.workshopRepository = new WorkshopRepository("workshoprepository.ofa");
         this.roomRepository = new RoomRepository("roomrepository.ofa");
+        this.planRepository = new PlanRepository("planrepository.ofa");
     }
 
     /**
@@ -428,6 +428,19 @@ public class Controller {
         return new ResponseEntity<>(workshopRepository.getAllWorkshops(), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/rest/plan/save")
+    public ResponseEntity<Void> savePlan(@RequestBody Plan plan) {
+        planRepository.savePlan(plan);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping("/rest/plan/get")
+    @ResponseBody
+    public ResponseEntity<Plan> getPlan() {
+        Plan plan = planRepository.loadPlan();
+        return new ResponseEntity<>(plan, HttpStatus.OK);
+    }
+
 
 
     // PRIVATE HELPER METHODS
@@ -447,10 +460,10 @@ public class Controller {
 
     // DEBUG METHODS ------ REMOVE BEFORE DEPLOY!
 
-    @JsonView(Views.Public.class)
+/*    @JsonView(Views.Public.class)
     @RequestMapping("/rest/debug/getallusers")
     @ResponseBody
     public ResponseEntity<Collection<User>> getAllUsers() {
         return new ResponseEntity<>(userRepository.getAllUsers(), HttpStatus.OK);
-    }
+    }*/
 }

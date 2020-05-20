@@ -53,3 +53,29 @@ const obj_to_map = ( obj => {
     Object.keys ( obj ). forEach (k => { mp.set(k, obj[k]) });
     return mp;
 });
+
+function obj_to_map_deep(o) {
+    let m = new Map()
+    for(let k of Object.keys(o)) {
+        if(o[k] instanceof Object) {
+            m.set(k, obj_to_map_deep(o[k]))
+        }
+        else {
+            m.set(k, o[k])
+        }
+    }
+    return m
+}
+
+function map_to_obj(map) {
+    let lo = {}
+    for(let[k,v] of map) {
+        if(v instanceof Map) {
+            lo[k] = map_to_obj(v)
+        }
+        else {
+            lo[k] = v
+        }
+    }
+    return lo
+}
