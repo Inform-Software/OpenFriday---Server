@@ -37,7 +37,12 @@
             <button class="btn btn-primary btn-lg btn-block disabledDiv">Planung ver&ouml;ffentlichen</button>
         </div>
     </div>
-    <div class="row justify-content-center">
+    <div class="row justify-content-center" v-if="!rooms.length || !slots.length">
+        <div class="col-10 col-md-6 jumbotron horizontal-centered-text">
+            <span class="text-danger">Es m&uuml;ssen mindestens ein Zeitslot und ein Raum vorhanden sein!</span>
+        </div>
+    </div>
+    <div class="row justify-content-center" v-else>
         <div class="col-10">
             <div class="table-responsive">
                 <table id="table" class="table table-bordered">
