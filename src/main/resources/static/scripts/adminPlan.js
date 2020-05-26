@@ -7,11 +7,16 @@ let content = new Vue({
         rooms: [],
         workshops: [],
         plan: new Map(),
-        unusedWorkshopIDs: []
+        unusedWorkshopIDs: [],
+        timestamp: new Date()
     },
     computed: {
         unusedWorkshops: function () {
             return this.workshops.filter(ws => $.inArray(ws.id, this.unusedWorkshopIDs) > -1)
+        },
+        timestamp_string: function () {
+            return this.timestamp.getDate() + "." + this.timestamp.getMonth() + "." + this.timestamp.getFullYear() + ", "
+                + this.timestamp.getHours() + ":" + String(this.timestamp.getMinutes()).padStart(2, "0");
         }
     },
     mounted() {
@@ -26,7 +31,7 @@ let content = new Vue({
         let roomPromise = axios
             .post("/rest/room/getall")
             .then(function (response) {
-                content.rooms = response.data;
+                content.rooms = response.data.filter(room => !jQuery.isEmptyObject(room.slots));
             })
         let workshopPromise = axios
             .post("/rest/workshop/getall")
@@ -38,6 +43,7 @@ let content = new Vue({
             axios
                 .post("/rest/plan/get")
                 .then(function (response) {
+                    content.timestamp = new Date(response.data.timestamp);
                     if (jQuery.isEmptyObject(response.data.table)) { // if true, there aren't any workshops in the plan yet
                         content.unusedWorkshopIDs = content.workshops.map(ws => ws.id);
                     }
@@ -69,9 +75,13 @@ let content = new Vue({
                     table: map_to_obj(content.plan),
                     unusedWorkshops: content.unusedWorkshopIDs
                 })
-                .then(function () {
+                .then(function (response) {
+                    content.timestamp = new Date(response.data);
                     alert("Planung gespeichert");
                 })
+        },
+        inArray: function (element, array) {
+            return $.inArray(element, array);
         }
     }
 })
@@ -97,9 +107,15 @@ function dropInTable (ev) {
         return;
     }
 
-    let keys = ev.target.id.split(':');
+    let keys = ev.target.id.split(':'); // 0: slotID, 1: roomID
     if (content.plan.get(keys[0]).has(keys[1])) {
         return; // do nothing if there is already a workshop at this position; is called if new workshop is dropped in td but not on old workshop in this td
+    }
+
+    // check if room is not available in this slot
+    if ($.inArray(keys[0], content.rooms.filter(room => room.id === keys[1])[0].slots.map(slot => slot.id)) < 0) {
+        console.log("Room not available.")
+        return;
     }
 
     let data = ev.dataTransfer.getData("text");

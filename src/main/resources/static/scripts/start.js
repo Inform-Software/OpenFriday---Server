@@ -72,7 +72,8 @@ let content = new Vue({
                     .post("/rest/workshop/delete/" + workshop.id)
                     .then(function () {
                         // stompClient.send("/app/ws/updateworkshops", {}, "");
-                        alert("Workshop gelöscht!");
+                        // alert("Workshop gelöscht!");
+                        console.log("Workshop gelöscht");
                     });
             }
         },

@@ -67,7 +67,8 @@ let content = new Vue({
                 axios
                     .post("/rest/slot/delete/" + slot.id)
                     .then(function () {
-                        alert("Slot gelöscht!");
+                        // alert("Slot gelöscht!");
+                        console.log("Raum gelöscht")
                     });
             }
         },
@@ -76,7 +77,8 @@ let content = new Vue({
                 axios
                     .post("/rest/room/delete/" + room.id)
                     .then(function () {
-                        alert("Raum gelöscht!");
+                        // alert("Raum gelöscht!");
+                        console.log("Raum gelöscht")
                     });
             }
         },

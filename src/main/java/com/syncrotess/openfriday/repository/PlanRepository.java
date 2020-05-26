@@ -3,6 +3,7 @@ package com.syncrotess.openfriday.repository;
 import com.syncrotess.openfriday.nodes.Plan;
 
 import java.io.*;
+import java.time.LocalDateTime;
 
 public class PlanRepository {
     private final String file;
@@ -35,9 +36,11 @@ public class PlanRepository {
         }
     }
 
-    public void savePlan(Plan plan) {
+    public LocalDateTime savePlan(Plan plan) {
+        plan.timestamp = LocalDateTime.now();
         repo = plan;
         saveFile();
+        return plan.timestamp;
     }
 
     public Plan loadPlan() {

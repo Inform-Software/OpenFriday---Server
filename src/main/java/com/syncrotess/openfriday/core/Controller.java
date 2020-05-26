@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -414,6 +415,12 @@ public class Controller {
     @RequestMapping("/rest/workshop/delete/{workshopID}")
     public ResponseEntity<Void> deleteWorkshop(@PathVariable ("workshopID") UUID id) {
         workshopRepository.deleteWorkshop(id);
+
+        // delete workshop from plan
+        Plan plan = planRepository.loadPlan();
+        plan.removeWorkshop(id);
+        planRepository.savePlan(plan);
+
         template.convertAndSend("/topic/workshops", workshopRepository.getAllWorkshops());
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -429,9 +436,8 @@ public class Controller {
     }
 
     @RequestMapping(value = "/rest/plan/save")
-    public ResponseEntity<Void> savePlan(@RequestBody Plan plan) {
-        planRepository.savePlan(plan);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<LocalDateTime> savePlan(@RequestBody Plan plan) {
+        return new ResponseEntity<>(planRepository.savePlan(plan), HttpStatus.OK); // save plan and return timestamp
     }
 
     @RequestMapping("/rest/plan/get")

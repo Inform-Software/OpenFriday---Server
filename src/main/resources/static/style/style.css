@@ -58,11 +58,19 @@ textarea {
         left: 2.5% !important;
         width: 95% !important;
     }
+
+    .table-content {
+        margin: 0;
+    }
 }
 
 @media screen and (max-height: 700px) {
     .popup-box {
         position: absolute !important;
+    }
+
+    .table-content {
+        margin: 0;
     }
 }
 
@@ -133,4 +141,29 @@ textarea {
 
 .table-content {
     max-width: 100%;
+}
+
+.blocked-table-data {
+    background: repeating-linear-gradient(
+            45deg,
+            #FFFFFF,
+            #FFFFFF 10px,
+            #e1e1e1 10px,
+            #e1e1e1 20px
+    );
+}
+
+.blocked-table-data-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+}
+
+.draggable {
+    cursor: grab;
+}
+
+.text-underline {
+    text-decoration: underline;
 }
