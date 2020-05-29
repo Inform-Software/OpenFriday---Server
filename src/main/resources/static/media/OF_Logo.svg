@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="375" height="80" viewBox="0 0 375 80">
+  <defs>
+    <clipPath id="clip-OF_Logo">
+      <rect width="375" height="80"/>
+    </clipPath>
+  </defs>
+  <g id="OF_Logo" data-name="OF Logo" clip-path="url(#clip-OF_Logo)">
+    <rect width="375" height="80" fill="#fff"/>
+    <g id="OF_Logo-2" data-name="OF Logo">
+      <rect id="Rechteck_178" data-name="Rechteck 178" width="375" height="80" fill="#fff"/>
+      <g id="Gruppe_1853" data-name="Gruppe 1853" transform="translate(0 2)">
+        <text id="Open_Friday" data-name="Open Friday" transform="translate(172 56)" fill="#222" font-size="26" font-family="Arial-BoldMT, Arial" font-weight="700"><tspan x="0" y="0">Open Friday</tspan></text>
+        <text id="GB60" transform="translate(172 29)" fill="#222" font-size="16" font-family="ArialMT, Arial"><tspan x="0" y="0">GB60</tspan></text>
+      </g>
+      <path id="Pfad_410" data-name="Pfad 410" d="M31.2,98.906H81.368L97.029,42.5H46.861Z" transform="translate(4.934 -37.568)" fill="#00546c"/>
+      <path id="Pfad_430" data-name="Pfad 430" d="M31.3,86.5h39l12-44h-39Z" transform="translate(37.698 -10.5)" fill="#007081" opacity="0.85"/>
+      <path id="Pfad_431" data-name="Pfad 431" d="M31.3,76.326h30l9-34h-30Z" transform="translate(70.698 -20.326)" fill="#0090a7" opacity="0.82"/>
+      <path id="Pfad_432" data-name="Pfad 432" d="M31.3,148.321h94l29-106h-94Z" transform="translate(-70.302 -68.321)" fill="#0090a7" opacity="0.51"/>
+    </g>
+  </g>
+</svg>

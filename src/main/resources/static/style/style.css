@@ -9,7 +9,7 @@
 }
 
 .logo {
-    margin-bottom: 50px;
+    margin-bottom: 1rem;
 }
 
 .user-icon {
@@ -26,6 +26,12 @@
 
 .btn-primary {
     background-color: #0091a5 !important;
+    border-color: #0091a5;
+}
+
+.btn-link {
+    /*text-decoration: underline;*/
+    color: #0091a5;
 }
 
 .jumbotron {
@@ -166,4 +172,21 @@ textarea {
 
 .text-underline {
     text-decoration: underline;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.header {
+    /*font-weight: bold;*/
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    margin-top: 1.5rem;
+    padding-left: 0;
+}
+
+.custom-control-label {
+    font-size: 1rem;
 }

@@ -24,15 +24,15 @@
     <title>Open Friday - Planung</title>
 </head>
 <body>
+<div class="row logo">
+    <div class="col">
+        <img src="/media/OF_Logo.svg" alt="Logo des OpenFriday">
+    </div>
+</div>
 <div class="container-fluid" id="content">
     <div class="row justify-content-center">
-        <div class="col-10 col-md-6 horizontal-centered logo">
-            <img src="https://i.ibb.co/N99n7r6/Screenshot-2019-10-18-Make-A-High-Quality-Logo-In-Just-5-Minutes-For-Under-30.png" alt="Logo des OpenFriday">
-        </div>
-    </div>
-    <div class="row justify-content-center">
         <div class="col-10 col-md-6">
-            <a href="/web/start.html" class="btn btn-danger btn-lg btn-block">Zur&uuml;ck</a>
+            <a href="/web/start.html" class="btn btn-primary btn-lg btn-block">Zur&uuml;ck</a>
         </div>
     </div>
     <div class="row justify-content-center" v-if="!rooms.length || !slots.length">
@@ -41,95 +41,46 @@
         </div>
     </div>
     <div class="row justify-content-center" v-else>
-        <div class="col-10">
-            <div class="table-responsive">
-                <table id="table" class="table table-bordered" style="table-layout: fixed;">
-                    <caption>
-                        Stand: {{timestamp_string}}<br>
-                        Workshopnamen sind unterstrichen, wenn du der Creator bist.
-                    </caption>
-                    <thead>
-                    <tr>
-                        <th style="width: 100px"></th>
-                        <th scope="col" style="text-align: center; width: 235px;" v-for="room in rooms">{{room.name}}<br><small>{{room.size}}</small></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="slot in slots">
-                        <th scope="row">{{slot.name}}</th>
-                        <td v-for="room in rooms" v-bind:id="slot.id + ':' + room.id"
-                            v-bind:class="{'blocked-table-data': inArray(slot.id, room.slots.map(s => s.id)) < 0}"
-                            v-bind:title="inArray(slot.id, room.slots.map(s => s.id)) < 0 ? 'Raum nicht verf&uuml;gbar' : ''"
-                        >
-                            <div v-if="inArray(slot.id, room.slots.map(s => s.id)) < 0" class="horizontal-centered-text blocked-table-data-content">
-                                <!--Raum nicht verf&uuml;gbar.-->
-                            </div>
-                            <div v-else-if="plan.get(slot.id).has(room.id) && inArray(plan.get(slot.id).get(room.id), workshops.map(ws => ws.id)) > -1" v-bind:id="plan.get(slot.id).get(room.id)">
-                                <div class="jumbotron table-content"
-                                     v-bind:class="{    'workshop-prio-high': votes.has(workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].id) && votes.get(workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].id) === 2,
-                                                        'workshop-prio-low': votes.has(workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].id) && votes.get(workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].id) === 1}">
-                                    <div class="row">
-                                        <div class="col-10">
-                                                <span v-bind:class="{'text-danger': inArray(slot.id, workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].slots.map(s => s.id)) < 0}">
-                                                    {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].slots.map(s => s.name.split('-')[0].trim()).join(" | ")}}
-                                                </span>
-                                        </div>
-                                        <div class="col-2">
-                                            {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].votesHigh + workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].votesLow}}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <b v-bind:class="{'text-underline': workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].creator === username}">
-                                                {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].name}}
-                                            </b>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].creator}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="col-10 col-md-6">
+
+            <div class="horizontal-centered-text header">
+                Aktueller Plan
             </div>
-        </div>
-    </div>
-<!--    <div class="row justify-content-center">
-        <div class="col-10 col-md-6 jumbotron" ondragover="event.preventDefault();" ondrop="dropInList(event)">
-            <h5>Aussortierte Workshops</h5>
-            <small>Diese Workshops werden bei der Optimierung der Planung nicht ber&uuml;cksichtigt.<br>
-                Workshops aus der Tabelle hier hin ziehen, um sie auszusortieren.</small>
-        </div>
-    </div>
-    <div v-for="workshop in unusedWorkshops">
-        <div class="row justify-content-center">
-            <div class="col-10 col-md-6 jumbotron workshop draggable" v-bind:id="workshop.id" draggable="true" ondragstart="dragFromList(event)">
+            <div v-for="slot in slots">
                 <div class="row">
-                    <div class="col-10">
-                        {{workshop.slots.map(slot => slot.name.split('-')[0].trim()).join(" | ")}}
-                    </div>
-                    <div class="col-2">
-                        {{workshop.votesHigh + workshop.votesLow}}
+                    <div class="col header">
+                        {{slot.name}}
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col workshop-header">
-                        {{workshop.name}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{workshop.creator}}
+                <div class="row justify-content-center" v-for="workshop in workshops.filter(ws => inArray(ws.id, Array.from(plan.get(slot.id).values())) > -1)">
+                    <div class="col jumbotron workshop"
+                         v-bind:class="{    'workshop-prio-high': votes.has(workshop.id) && votes.get(workshop.id) === 2,
+                                                        'workshop-prio-low': votes.has(workshop.id) && votes.get(workshop.id) === 1}">
+                        <div class="row">
+                            <div class="col-10">
+                                <b>{{workshop.name}}</b>
+                            </div>
+                            <div class="col-2 text-right">
+                                {{workshop.votesHigh + workshop.votesLow}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                Raum
+                            </div>
+                            <div class="col-7 text-right" v-bind:class="{'text-bold': workshop.creator === username}">
+                                {{workshop.creator}}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <p style="margin-top: 1rem" class="horizontal-centered-text">
+                Stand: {{timestamp_string}}
+            </p>
         </div>
-    </div>-->
+    </div>
 </div>
 
 <script src="/scripts/plan.js"></script>
