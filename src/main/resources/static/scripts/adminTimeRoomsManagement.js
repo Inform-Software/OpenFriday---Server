@@ -124,7 +124,7 @@ let slotBox = new Vue({
 
             if (slotBox.editing) {
                 axios
-                    .post("/rest/slot/edit/" + this.slot.id, {
+                    .post("/rest/slot/add", {
                         id: this.slot.id,
                         name: this.name
                     })
