@@ -3,7 +3,7 @@ ensureAdmin();
 let stompClient = null;
 connect();
 
-const username = getCookie("username");
+const user = JSON.parse(getCookie("user"));
 
 
 
@@ -25,6 +25,9 @@ function onSlotMessageReceived(payload) {
 
 function onRoomMessageReceived(payload) {
     content.rooms = JSON.parse(payload.body);
+    for (let i = 0; i < content.rooms.length; i++) {
+        content.rooms[i].timeslots = content.rooms[i].timeslots.sort((a, b) => a.name.localeCompare(b.name))
+    }
 }
 
 function onConnected() {
@@ -59,6 +62,9 @@ let content = new Vue({
             .post("/rest/room/getall")
             .then(function (response) {
                 content.rooms = response.data;
+                for (let i = 0; i < content.rooms.length; i++) {
+                    content.rooms[i].timeslots = content.rooms[i].timeslots.sort((a, b) => a.name.localeCompare(b.name))
+                }
             })
     },
     methods: {
@@ -124,7 +130,7 @@ let slotBox = new Vue({
 
             if (slotBox.editing) {
                 axios
-                    .post("/rest/slot/edit/" + this.slot.id, {
+                    .post("/rest/slot/add", {
                         id: this.slot.id,
                         name: this.name
                     })
@@ -191,11 +197,11 @@ let roomBox = new Vue({
 
             if (roomBox.editing) {
                 axios
-                    .post("/rest/room/edit/" + this.room.id, {
+                    .post("/rest/room/add", {
                         id: this.room.id,
                         name: this.name,
                         size: this.size,
-                        slots: selectedSlots
+                        timeslots: selectedSlots
                     })
                     .then(function () {
                         alert("Raum gespeichert.");
@@ -207,7 +213,7 @@ let roomBox = new Vue({
                     .post("/rest/room/add", {
                         name: roomBox.name,
                         size: roomBox.size,
-                        slots: selectedSlots
+                        timeslots: selectedSlots
                     })
                     .then(function () {
                         alert("Raum hinzugefügt.");
@@ -256,8 +262,8 @@ function updateCheckboxes() {
         window.requestAnimationFrame(updateCheckboxes);
     }else {
         for (let i = 0; i < checkboxes.length; i++) {
-            for (let j = 0; j < roomBox.room.slots.length; j++) {
-                if (roomBox.room.slots[j].id === checkboxes[i].id) {
+            for (let j = 0; j < roomBox.room.timeslots.length; j++) {
+                if (roomBox.room.timeslots[j].id == checkboxes[i].id) {
                     checkboxes[i].checked = true;
                 }
             }

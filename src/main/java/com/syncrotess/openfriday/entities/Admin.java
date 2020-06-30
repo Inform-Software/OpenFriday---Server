@@ -1,28 +1,24 @@
-package com.syncrotess.openfriday.nodes;
+package com.syncrotess.openfriday.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import javax.persistence.Entity;
+import java.util.Set;
 
+@Entity
 public class Admin extends User {
 
-    @JsonView(Views.Internal.class) // hides field password in http responses if the method is annotated with Views.Public.class
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // hides field password in websocket messages
     private String password;
 
     public Admin() {}
 
-    public Admin(String name, String password, List<Slot> slots) {
-        super(name, slots);
+    public Admin(String name, String password, Set<Timeslot> timeslots) {
+        super(name, timeslots);
         this.password = password;
     }
 
-    public Admin(UUID id, String name, String password, List<Slot> slots, HashMap<UUID, Integer> votes) {
-        super(id, name, slots, votes);
+    public Admin(Long id, String name, String password, Set<Timeslot> timeslots, Set<Vote> votes) {
+        super(id, name, timeslots, votes);
         this.password = password;
     }
 
@@ -43,6 +39,7 @@ public class Admin extends User {
         password = newPassword;
     }
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // hides field password in websocket messages and http responses
     public String getPassword() {
         return password;
     }

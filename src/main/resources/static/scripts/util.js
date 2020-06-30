@@ -1,5 +1,5 @@
 function ensureLogin() {
-    if (getCookie("username").isEmpty()) {
+    if (getCookie("user").isEmpty()) {
         window.location.href = "/web/login.html";
         return false;
     }
@@ -11,7 +11,7 @@ function ensureAdmin() {
         return;
     }
     axios
-        .post("/rest/user/isadmin/" + getCookie("userID"))
+        .post("/rest/user/isadmin/" + JSON.parse(getCookie("user")).id)
         .then(function (response) {
             if (!response.data) {
                 window.location.href = "/web/start.html";
@@ -20,7 +20,7 @@ function ensureAdmin() {
 }
 
 function logout() {
-    document.cookie = "username=''; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "user=''; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     window.location.href = "/";
 }
 

@@ -1,7 +1,6 @@
 ensureAdmin();
 
-const username = getCookie("username");
-const userID = getCookie("userID");
+const user = JSON.parse(getCookie("user"));
 
 let content = new Vue({
     el: "#content",
@@ -12,7 +11,7 @@ let content = new Vue({
         newPasswordAgain: "",
         errorMessage: "",
         successMessage: "",
-        username: username
+        username: user.name
     },
     mounted() {
         axios
@@ -21,7 +20,7 @@ let content = new Vue({
                 content.workshopAmount = response.data.length;
             })
 
-        if (username === "admin") {
+        if (this.username === "admin") {
             this.errorMessage = "Passwort kann für den Standard-Admin nicht geändert werden.";
         }
     },
@@ -38,7 +37,7 @@ let content = new Vue({
             }
 
             axios
-                .post("/rest/user/changePassword/" + userID, [$.md5(this.currentPassword), $.md5(this.newPassword)])
+                .post("/rest/user/changePassword/" + user.id, [$.md5(this.currentPassword), $.md5(this.newPassword)])
                 .then(function (response) {
                     console.log(response)
                     if (response.data === true) {

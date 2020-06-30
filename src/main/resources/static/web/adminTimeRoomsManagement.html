@@ -51,19 +51,19 @@
             <h6 class="horizontal-centered-text">Noch keine Slots vorhanden.</h6>
         </div>
         <div class="col-10 col-md-6" v-else>
-            <div class="row" v-for="slot in slots">
+            <div class="row" v-for="timeslot in slots">
                 <div class="col jumbotron admin-jumbotron">
                     <div class="row">
                         <div class="col">
-                            Zeit: {{slot.name}}
+                            Zeit: {{timeslot.name}}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button class="btn btn-primary btn-block " v-on:click="editSlot(slot)">Bearbeiten</button>
+                            <button class="btn btn-primary btn-block " v-on:click="editSlot(timeslot)">Bearbeiten</button>
                         </div>
                         <div class="col">
-                            <button class="btn btn-danger btn-block " v-on:click="deleteSlot(slot)">L&ouml;schen</button>
+                            <button class="btn btn-danger btn-block " v-on:click="deleteSlot(timeslot)">L&ouml;schen</button>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            Zeiten: {{room.slots.map(slot => slot.name.split('-')[0].trim()).join(" / ")}}
+                            Zeiten: {{room.timeslots.map(timeslot => timeslot.name.split('-')[0].trim()).join(" / ")}}
                         </div>
                     </div>
                     <div class="row">
@@ -120,7 +120,7 @@
 <!-- ---------------- Popup Boxes ----------------- -->
 
 <div class="container">
-    <!-- Slot box -->
+    <!-- Timeslot box -->
     <div class="popup-box" id="slot-box" v-if="isVisible">
         <div class="row justify-content-center">
             <div class="col box-header">
@@ -138,8 +138,8 @@
             <div class="col-10">
                 <form v-on:submit.prevent="addSlot()">
                     <div class="form-group">
-                        <label for="slot-name">Name (in der Form <i>8:15 - 12:45</i>):</label>
-                        <input type="text" id="slot-name" class="form-control" v-model="name">
+                        <label for="timeslot-name">Name (in der Form <i>8:15 - 12:45</i>):</label>
+                        <input type="text" id="timeslot-name" class="form-control" v-model="name">
                     </div>
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Best&auml;tigen</button>
                 </form>
@@ -172,15 +172,15 @@
                         <label for="room-size">Gr&ouml;&szlig;e</label>
                         <input type="number" id="room-size" class="form-control" v-model="size">
                     </div>
-                    <div v-for="slot in slots">
+                    <div v-for="timeslot in slots">
                         <div class="row justify-content-center">
                             <div class="col">
-                                <label class="form-check-label" v-bind:for="slot.id">
-                                    {{slot.name}}
+                                <label class="form-check-label" v-bind:for="timeslot.id">
+                                    {{timeslot.name}}
                                 </label>
                             </div>
                             <div class="col horizontal-centered-text">
-                                <input class="form-check-input" type="checkbox" name="time-slot" v-bind:id="slot.id">
+                                <input class="form-check-input" type="checkbox" name="time-slot" v-bind:id="timeslot.id">
                             </div>
                         </div>
                     </div>

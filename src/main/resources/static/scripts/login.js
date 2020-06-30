@@ -1,4 +1,4 @@
-if (!getCookie("username").isEmpty()) {
+if (!getCookie("user").isEmpty()) {
     window.location.href = "/web/start.html";
 }
 
@@ -26,8 +26,7 @@ let adminLogin = new Vue({
                 .then(function(response){
                     console.log(response)
                     if (response.data){
-                        setCookie("username", response.data.name.toLowerCase());
-                        setCookie("userID", response.data.id);
+                        setCookie("user", JSON.stringify(response.data));
                         window.location.href = "/web/start.html";
                     }
                 })
@@ -52,7 +51,7 @@ let content = new Vue({
     methods: {
         // logs in a user
         loginUser: function () {
-            let username = $("#name").val();
+            let username = $("#name").val().trim();
 
             if (username.isEmpty()) {
                 return;
@@ -66,8 +65,7 @@ let content = new Vue({
             axios
                 .post("/rest/login/user/", {name: username})
                 .then(function(response){
-                    setCookie("username", response.data.name.toLowerCase());
-                    setCookie("userID", response.data.id);
+                    setCookie("user", JSON.stringify(response.data));
                     window.location.href = "/web/start.html";
                 })
                 .catch(function (error) {
