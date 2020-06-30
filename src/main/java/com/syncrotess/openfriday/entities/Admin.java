@@ -12,13 +12,13 @@ public class Admin extends User {
 
     public Admin() {}
 
-    public Admin(String name, String password, Set<Slot> slots) {
-        super(name, slots);
+    public Admin(String name, String password, Set<Timeslot> timeslots) {
+        super(name, timeslots);
         this.password = password;
     }
 
-    public Admin(Long id, String name, String password, Set<Slot> slots, Set<Vote> votes) {
-        super(id, name, slots, votes);
+    public Admin(Long id, String name, String password, Set<Timeslot> timeslots, Set<Vote> votes) {
+        super(id, name, timeslots, votes);
         this.password = password;
     }
 

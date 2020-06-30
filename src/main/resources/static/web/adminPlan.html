@@ -33,11 +33,11 @@
     <div class="row justify-content-center">
         <div class="col-10 col-md-6">
             <a href="/web/admin.html" class="btn btn-primary btn-lg btn-block">Zur&uuml;ck</a>
-            <button class="btn btn-primary btn-lg btn-block disabledDiv">Planung optimieren</button>
+            <button class="btn btn-primary btn-lg btn-block disabledDiv" v-on:click="optimizePlan()">Planung optimieren</button>
             <button class="btn btn-primary btn-lg btn-block" v-on:click="savePlan()">Planung speichern und ver&ouml;ffentlichen</button>
         </div>
     </div>
-    <div class="row justify-content-center" v-if="!rooms.length || !slots.length">
+    <div class="row justify-content-center" v-if="!plan.rooms.length || !plan.timeslots.length">
         <div class="col-10 col-md-6 jumbotron horizontal-centered-text">
             <span class="text-danger">Es m&uuml;ssen mindestens ein Zeitslot und ein Raum vorhanden sein!</span>
         </div>
@@ -47,45 +47,45 @@
             <div class="table-responsive">
                 <table id="table" class="table table-bordered" style="table-layout: fixed;">
                     <caption>
-                        Stand: {{timestamp_string}} <br>
+                        <!--Stand: {{timestamp_string}} <br>-->
                         Hinweis: Das manuelle Bearbeiten mittels Drag and Drop funktioniert nicht mit Touch Eingabe.
                     </caption>
                     <thead>
                     <tr>
                         <th style="width: 100px"></th>
-                        <th scope="col" style="text-align: center; width: 235px;" v-for="room in rooms">{{room.name}}<br><small>{{room.size}}</small></th>
+                        <th scope="col" style="text-align: center; width: 235px;" v-for="room in plan.rooms">{{room.name}}<br><small>{{room.size}}</small></th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="slot in slots">
-                        <th scope="row">{{slot.name}}</th>
-                            <td v-for="room in rooms" v-bind:id="slot.id + ':' + room.id" ondragover="event.preventDefault();" ondrop="dropInTable(event)"
-                                v-bind:class="{'blocked-table-data': inArray(slot.id, room.slots.map(s => s.id)) < 0}"
-                                v-bind:title="inArray(slot.id, room.slots.map(s => s.id)) < 0 ? 'Raum nicht verf&uuml;gbar' : ''"
+                    <tr v-for="timeslot in plan.timeslots">
+                        <th scope="row">{{timeslot.name}}</th>
+                            <td v-for="room in plan.rooms" v-bind:id="timeslot.id + ':' + room.id" ondragover="event.preventDefault();" ondrop="dropInTable(event)"
+                                v-bind:class="{'blocked-table-data': inArray(timeslot.id, room.timeslots.map(ts => ts.id)) < 0}"
+                                v-bind:title="inArray(timeslot.id, room.timeslots.map(ts => ts.id)) < 0 ? 'Raum nicht verf&uuml;gbar' : ''"
                             >
-                                <div v-if="inArray(slot.id, room.slots.map(s => s.id)) < 0" class="horizontal-centered-text blocked-table-data-content">
+                                <div v-if="inArray(timeslot.id, room.timeslots.map(ts => ts.id)) < 0" class="horizontal-centered-text blocked-table-data-content">
                                     <!--Raum nicht verf&uuml;gbar.-->
                                 </div>
-                                <div v-else-if="plan.get(slot.id).has(room.id) && inArray(plan.get(slot.id).get(room.id), workshops.map(ws => ws.id)) > -1" v-bind:id="plan.get(slot.id).get(room.id)" draggable="true" ondragstart="dragFromTable(event)" class="draggable">
+                                <div v-else-if="plan.workshops.find(ws => ws.room && ws.timeslot && ws.room.id === room.id && ws.timeslot.id === timeslot.id)" v-bind:id="plan.workshops.find(ws => ws.room && ws.timeslot && ws.room.id === room.id && ws.timeslot.id === timeslot.id).id" draggable="true" ondragstart="dragFromTable(event)" class="draggable">
                                     <div class="jumbotron table-content">
                                         <div class="row">
                                             <div class="col-10">
-                                                <span v-bind:class="{'text-danger': inArray(slot.id, workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].slots.map(s => s.id)) < 0}">
-                                                    {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].slots.map(s => s.name.split('-')[0].trim()).join(" | ")}}
+                                                <span v-bind:class="{'text-danger': inArray(timeslot.id, plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).possibleTimeslots.map(ts => ts.id)) < 0}">
+                                                    {{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).possibleTimeslots.map(s => s.name.split('-')[0].trim()).join(" | ")}}
                                                 </span>
                                             </div>
                                             <div class="col-2">
-                                                {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].votesHigh + workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].votesLow}}
+                                                {{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).totalVotes}}
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col">
-                                                <b>{{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].name}}</b>
+                                                <b>{{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).name}}</b>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col">
-                                                {{workshops.filter(ws => ws.id === plan.get(slot.id).get(room.id))[0].creator}}
+                                                {{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).creator.name}}
                                             </div>
                                         </div>
                                     </div>
@@ -109,10 +109,10 @@
             <div class="col-10 col-md-6 jumbotron workshop draggable" v-bind:id="workshop.id" draggable="true" ondragstart="dragFromList(event)">
                 <div class="row">
                     <div class="col-10">
-                        {{workshop.slots.map(slot => slot.name.split('-')[0].trim()).join(" | ")}}
+                        {{workshop.possibleTimeslots.map(timeslot => timeslot.name.split('-')[0].trim()).join(" | ")}}
                     </div>
                     <div class="col-2">
-                        {{workshop.votesHigh + workshop.votesLow}}
+                        {{workshop.totalVotes}}
                     </div>
                 </div>
                 <div class="row">
@@ -122,7 +122,7 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        {{workshop.creator}}
+                        {{workshop.creator.name}}
                     </div>
                 </div>
             </div>

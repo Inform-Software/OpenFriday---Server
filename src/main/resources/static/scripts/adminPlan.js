@@ -1,83 +1,47 @@
 ensureAdmin();
 
+let stompClient = null;
+connect();
+
 let content = new Vue({
     el: "#content",
     data: {
-        slots: [],
-        rooms: [],
-        workshops: [],
-        plan: new Map(),
-        unusedWorkshopIDs: [],
-        timestamp: new Date()
+        plan: {
+            workshops: [],
+            timeslots: [],
+            rooms: []
+        }
     },
     computed: {
         unusedWorkshops: function () {
-            return this.workshops.filter(ws => $.inArray(ws.id, this.unusedWorkshopIDs) > -1)
-        },
-        timestamp_string: function () {
-            return this.timestamp.getDate() + "." + this.timestamp.getMonth() + "." + this.timestamp.getFullYear() + ", "
-                + this.timestamp.getHours() + ":" + String(this.timestamp.getMinutes()).padStart(2, "0");
+            return this.plan.workshops.filter(ws => !ws.room && !ws.timeslot)
         }
+        // timestamp_string: function () {
+        //     return this.timestamp.getDate() + "." + this.timestamp.getMonth() + "." + this.timestamp.getFullYear() + ", "
+        //         + this.timestamp.getHours() + ":" + String(this.timestamp.getMinutes()).padStart(2, "0");
+        // }
     },
     mounted() {
-        let slotPromise = axios
-            .post("/rest/slot/getall")
+        axios
+            .post("/rest/plan/get")
             .then(function (response) {
-                content.slots = response.data;
-                for (let i = 0; i < content.slots.length; i++) {
-                    content.plan.set(content.slots[i].id, new Map());
-                }
+                content.plan = response.data;
             })
-        let roomPromise = axios
-            .post("/rest/room/getall")
-            .then(function (response) {
-                content.rooms = response.data.filter(room => !jQuery.isEmptyObject(room.slots));
-            })
-        let workshopPromise = axios
-            .post("/rest/workshop/getall")
-            .then(function (response) {
-                content.workshops = response.data;
-            })
-
-        Promise.all([slotPromise, roomPromise, workshopPromise]).then(function () {
-            axios
-                .post("/rest/plan/get")
-                .then(function (response) {
-                    content.timestamp = new Date(response.data.timestamp);
-                    if (jQuery.isEmptyObject(response.data.table)) { // if true, there aren't any workshops in the plan yet
-                        content.unusedWorkshopIDs = content.workshops.map(ws => ws.id);
-                    }
-                    else {
-                        content.plan = obj_to_map_deep(response.data.table);
-                        for (let i = 0; i < content.workshops.length; i++) {
-                            if (!containsWorkshop(content.plan, content.workshops[i].id)) {
-                                content.unusedWorkshopIDs.push(content.workshops[i].id);
-                            }
-                        }
-
-                        // check if there are workshops saved to a room not existing anymore. push them to unused workshops
-                        for (let value of content.plan.values()) {
-                            for (let [roomID, workshopID] of value.entries()) {
-                                if ($.inArray(roomID, content.rooms.map(room => room.id)) < 0) {
-                                    content.unusedWorkshopIDs.push(workshopID);
-                                    value.delete(roomID);
-                                }
-                            }
-                        }
-                    }
-                })
-        })
     },
     methods: {
         savePlan: function () {
             axios
-                .post("/rest/plan/save", {
-                    table: map_to_obj(content.plan),
-                    unusedWorkshops: content.unusedWorkshopIDs
-                })
+                .post("/rest/plan/save", content.plan)
                 .then(function (response) {
-                    content.timestamp = new Date(response.data);
+                    // content.timestamp = new Date(response.data);
                     alert("Planung gespeichert");
+                })
+        },
+        optimizePlan: function () {
+            axios
+                .post("/rest/plan/optimize")
+                .then(function (response) {
+                    // content.plan = response.data;
                 })
         },
         inArray: function (element, array) {
@@ -107,29 +71,28 @@ function dropInTable (ev) {
         return;
     }
 
-    let keys = ev.target.id.split(':'); // 0: slotID, 1: roomID
-    if (content.plan.get(keys[0]).has(keys[1])) {
+    let [slotID, roomID] = ev.target.id.split(':');
+    if (content.plan.workshops.filter(ws => ws.room && ws.room.id == roomID && ws.timeslot && ws.timeslot.id == slotID).length > 0) {
         return; // do nothing if there is already a workshop at this position; is called if new workshop is dropped in td but not on old workshop in this td
     }
 
     // check if room is not available in this slot
-    if ($.inArray(keys[0], content.rooms.filter(room => room.id === keys[1])[0].slots.map(slot => slot.id)) < 0) {
+    if ($.inArray(parseInt(slotID), content.plan.rooms.filter(room => room.id == roomID)[0].timeslots.map(slot => slot.id)) < 0) {
         console.log("Room not available.")
         return;
     }
 
     let data = ev.dataTransfer.getData("text");
     if (!data.includes(":")) { // true if origin of dropped item is the list of unused workshops
-        content.unusedWorkshopIDs = content.unusedWorkshopIDs.filter(id => id !== data); // remove workshop from unused workshops
-
-        // content.plan.set(keys[0], content.plan.get(keys[0]).set(keys[1], data)); // add workshop to table
-        content.plan.get(keys[0]).set(keys[1], data);
+        let workshop = content.plan.workshops.find(ws => ws.id == data);
+        workshop.room = content.plan.rooms.find(r => r.id == roomID);
+        workshop.timeslot = content.plan.timeslots.find(t => t.id == slotID);
     }
     else {
         data = data.split(':');
-        content.plan.get(data[1]).delete(data[2]); // remove workshop from plan
-        // content.plan.set(keys[0], content.plan.get(keys[0]).set(keys[1], data[0])); // add workshop to plan
-        content.plan.get(keys[0]).set(keys[1], data[0]);
+        let workshop = content.plan.workshops.find(ws => ws.id == data[0]);
+        workshop.room = content.plan.rooms.find(r => r.id == roomID);
+        workshop.timeslot = content.plan.timeslots.find(t => t.id == slotID);
     }
     content.$forceUpdate();
 }
@@ -138,15 +101,9 @@ function dropInList (ev) {
     ev.preventDefault();
     let data = ev.dataTransfer.getData("text").split(':'); // 0: workshopID, 1: slotID, 2: roomID
     // check if workshop already in list => if yes do nothing
-    if (content.unusedWorkshopIDs.filter(id => id === data[0]).length) {
-        return;
-    }
-
-    let tmp = content.workshops.filter(ws => ws.id === data[0])[0]; // add workshop to unused workshops
-    content.unusedWorkshopIDs.push(tmp.id);
-
-    // content.plan.set(data[1], content.plan.get(data[1]).delete(data[2])); // remove workshop from table
-    content.plan.get(data[1]).delete(data[2]);
+    let workshop = content.plan.workshops.find(ws => ws.id == data[0]);
+    workshop.room = null;
+    workshop.timeslot = null;
     content.$forceUpdate();
 }
 
@@ -159,4 +116,27 @@ function containsWorkshop(nestedMap, workshopID) {
         }
     }
     return false;
+}
+
+function connect() {
+
+    let socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.debug = () => {};
+
+    stompClient.connect({}, onConnected, onError);
+}
+
+
+function onPlanMessageReceived(payload) {
+    content.plan = JSON.parse(payload.body);
+}
+
+function onConnected() {
+    stompClient.subscribe('/topic/plan', onPlanMessageReceived);
+}
+
+
+function onError(error) {
+    console.log("Websocket: Could not connect to server.")
 }

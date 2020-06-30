@@ -35,7 +35,7 @@
             <a href="/web/start.html" class="btn btn-primary btn-lg btn-block">Zur&uuml;ck</a>
         </div>
     </div>
-    <div class="row justify-content-center" v-if="!rooms.length || !slots.length">
+    <div class="row justify-content-center" v-if="!plan.rooms.length || !plan.timeslots.length">
         <div class="col-10 col-md-6 jumbotron horizontal-centered-text">
             <span class="text-danger">Es m&uuml;ssen mindestens ein Zeitslot und ein Raum vorhanden sein!</span>
         </div>
@@ -46,39 +46,39 @@
             <div class="horizontal-centered-text header">
                 Aktueller Plan
             </div>
-            <div v-for="slot in slots">
+            <div v-for="timeslot in plan.timeslots">
                 <div class="row">
                     <div class="col header">
-                        {{slot.name}}
+                        {{timeslot.name}}
                     </div>
                 </div>
-                <div class="row justify-content-center" v-for="workshop in workshops.filter(ws => inArray(ws.id, Array.from(plan.get(slot.id).values())) > -1)">
+                <div class="row justify-content-center" v-for="workshop in plan.workshops.filter(ws => ws.timeslot && ws.timeslot.id === timeslot.id)">
                     <div class="col jumbotron workshop"
-                         v-bind:class="{    'workshop-prio-high': votes.has(workshop.id) && votes.get(workshop.id) === 2,
-                                                        'workshop-prio-low': votes.has(workshop.id) && votes.get(workshop.id) === 1}">
+                         v-bind:class="{    'workshop-prio-high': votes.filter(v => v.workshop.id === workshop.id && v.priority === 2).length > 0,
+                                            'workshop-prio-low': votes.filter(v => v.workshop.id === workshop.id && v.priority === 1).length > 0}">
                         <div class="row">
                             <div class="col-10">
                                 <b>{{workshop.name}}</b>
                             </div>
                             <div class="col-2 text-right">
-                                {{workshop.votesHigh + workshop.votesLow}}
+                                {{workshop.totalVotes}}
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-5">
-                                Raum
+                                {{workshop.room.name}}
                             </div>
-                            <div class="col-7 text-right" v-bind:class="{'text-bold': workshop.creator === username}">
-                                {{workshop.creator}}
+                            <div class="col-7 text-right" v-bind:class="{'text-bold': workshop.creator.name === username}">
+                                {{workshop.creator.name}}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <p style="margin-top: 1rem" class="horizontal-centered-text">
-                Stand: {{timestamp_string}}
-            </p>
+<!--            <p style="margin-top: 1rem" class="horizontal-centered-text">-->
+<!--                Stand: {{timestamp_string}}-->
+<!--            </p>-->
         </div>
     </div>
 </div>

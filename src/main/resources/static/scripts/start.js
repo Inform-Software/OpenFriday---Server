@@ -2,35 +2,34 @@ ensureLogin();
 
 let stompClient = null;
 connect();
-const username = getCookie("username");
-const userID = getCookie("userID");
+const user = JSON.parse(getCookie("user"));
 
 let content = new Vue({
     el: "#content",
     data: {
-        username: username,
-        userID: userID,
+        username: user.name,
+        userID: user.id,
         admin: false,       // if the current user is an admin
-        slots: "",          // all slots available
+        timeslots: "",          // all slots available
         userSlots: "",      // the slots the user is available
         // toggle: false,
         isDisabled: false,  // used to set the disabledDiv class on the html container
         workshops: "",      // list of all available workshops
-        votes: ""           // all votes of the user
+        votes: []           // all votes of the user
     },
     mounted() {
         axios
-            .post("/rest/user/isadmin/" + userID)
+            .post("/rest/user/isadmin/" + user.id)
             .then(function(response){
                 content.admin = response.data;
             })
         axios
             .post("/rest/slot/getall")
             .then(function (response){
-                content.slots = response.data;
+                content.timeslots = response.data;
             })
         axios
-            .post("/rest/user/getslots/" + userID)
+            .post("/rest/user/getslots/" + user.id)
             .then(function (response) {
                 content.userSlots = response.data;
 
@@ -38,16 +37,16 @@ let content = new Vue({
                 updateCheckboxes();
             })
         axios
-            .post("/rest/user/getvotes/" + userID)
+            .post("/rest/user/getvotes/" + user.id)
             .then(function (response) {
-                content.votes = obj_to_map(response.data);
+                content.votes = response.data;
             })
         axios
             .post("/rest/workshop/getall")
             .then(function (response) {
                 content.workshops = response.data;
                 for (let i = 0; i < content.workshops.length; i++) {
-                    content.workshops[i].slots = content.workshops[i].slots.sort((a, b) => a.name.localeCompare(b.name))
+                    content.workshops[i].possibleTimeslots = content.workshops[i].possibleTimeslots.sort((a, b) => a.name.localeCompare(b.name))
                 }
             })
     },
@@ -57,11 +56,12 @@ let content = new Vue({
             let checkboxes = document.getElementsByName("time-slot");
             for (let i = 0; i < checkboxes.length; i++) {
                 if (checkboxes[i].checked) {
-                    slotIds.push(checkboxes[i].id);
+                    slotIds.push(parseInt(checkboxes[i].id));
                 }
             }
+
             axios
-                .post("/rest/user/setslots/" + userID, slotIds)
+                .post("/rest/user/setslots/" + user.id, content.timeslots.filter(s => $.inArray(s.id, slotIds) > -1))
                 .catch(function () {
                     alert("Fehler: Zeiten konnten nicht gespeichert werden.")
                 })
@@ -71,8 +71,6 @@ let content = new Vue({
                 axios
                     .post("/rest/workshop/delete/" + workshop.id)
                     .then(function () {
-                        // stompClient.send("/app/ws/updateworkshops", {}, "");
-                        // alert("Workshop gelöscht!");
                         console.log("Workshop gelöscht");
                     });
             }
@@ -82,7 +80,7 @@ let content = new Vue({
             workshopBox.workshopId = workshop.id;
             workshopBox.workshopName = workshop.name;
             workshopBox.workshopDescription = workshop.description;
-            workshopBox.workshopSlots = workshop.slots;
+            workshopBox.workshopSlots = workshop.possibleTimeslots;
             workshopBox.workshopCreator = workshop.creator;
             toggleWorkshopBox();
 
@@ -91,12 +89,10 @@ let content = new Vue({
 
         },
         voteForWorkshop: function (workshop) {
-            console.log("Voting...")
             axios
-                .post("/rest/user/vote/" + userID + "/" + workshop.id)
+                .post("/rest/user/vote/" + user.id + "/" + workshop.id)
                 .then(function (response) {
-                    console.log("Voting done")
-                    content.votes = obj_to_map(response.data);
+                    content.votes = response.data;
                 })
         }
     }
@@ -111,7 +107,7 @@ let workshopBox = new Vue({
         workshopName: "",
         workshopDescription: "",
         workshopCreator: "",
-        slots: "",
+        timeslots: "",
         errormessage: "",
         workshopSlots: ""
     },
@@ -120,7 +116,7 @@ let workshopBox = new Vue({
         axios
             .post("/rest/slot/getall")
             .then(function (response){
-                workshopBox.slots = response.data;
+                workshopBox.timeslots = response.data;
             })
     },
     methods: {
@@ -153,21 +149,21 @@ let workshopBox = new Vue({
 
             // get slots with selected ids
             let selectedSlots = [];
-            for (let i = 0; i < this.slots.length; i++) {
-                if ($.inArray(this.slots[i].id.toString(), slotIds) !== -1) {
+            for (let i = 0; i < this.timeslots.length; i++) {
+                if ($.inArray(this.timeslots[i].id.toString(), slotIds) !== -1) {
                     // console.log("SlotID: " + this.slots[i].id);
-                    selectedSlots.push(this.slots[i]);
+                    selectedSlots.push(this.timeslots[i]);
                 }
             }
 
             if (workshopBox.editing) {
                 axios
-                    .post("/rest/workshop/edit/" + this.workshopId, {
+                    .post("/rest/workshop/add", {
                         id: this.workshopId,
                         creator: this.workshopCreator,
                         name: this.workshopName,
                         description: this.workshopDescription,
-                        slots: selectedSlots
+                        possibleTimeslots: selectedSlots
                     })
                     .then(function () {
                         workshopBox.closeBox();
@@ -176,10 +172,10 @@ let workshopBox = new Vue({
             else {
                 axios
                     .post("/rest/workshop/add", {
-                        creator: username,
+                        creator: user,
                         name: this.workshopName,
                         description: this.workshopDescription,
-                        slots: selectedSlots
+                        possibleTimeslots: selectedSlots
                     })
                     .then(function () {
                         workshopBox.closeBox();
@@ -261,7 +257,7 @@ function onWorkshopMessageReceived(payload) {
     // console.log("Websocket: Received message from server.")
     content.workshops = JSON.parse(payload.body);
     for (let i = 0; i < content.workshops.length; i++) {
-        content.workshops[i].slots = content.workshops[i].slots.sort((a, b) => a.name.localeCompare(b.name))
+        content.workshops[i].possibleTimeslots = content.workshops[i].possibleTimeslots.sort((a, b) => a.name.localeCompare(b.name))
     }
 }
 
