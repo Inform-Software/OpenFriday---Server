@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 @Controller
 public class MainController {
 
-    private Timetable timetable;
-
     private final SimpMessagingTemplate template;
 
     private final UserRepository userRepository;
@@ -414,27 +412,23 @@ public class MainController {
     }
 
     @RequestMapping("/rest/plan/optimize")
-    public ResponseEntity<Timetable> optimizeTimetable() throws InterruptedException {
-        solverManager.terminateEarly(TimetableRepository.SINGLETON_TIMETABLE_ID);
+    public ResponseEntity<Timetable> optimizeTimetable() {
+        solverManager.terminateEarly(TimetableRepository.SINGLETON_TIMETABLE_ID); // just to ensure the solver is not running. Otherwise solveAndListen would throw exception
         solverManager.solveAndListen(TimetableRepository.SINGLETON_TIMETABLE_ID,
                 timetableRepository::findById,
                 this::handlePlanDone);
-//        Thread.sleep(5000);
-//        solverManager.terminateEarly(TimetableRepository.SINGLETON_TIMETABLE_ID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void handlePlanDone(Timetable timetable) {
-        this.timetable = timetable;
         template.convertAndSend("/topic/plan", timetable);
-        System.out.println("DONE");
-//        timetableRepository.save(timetable);
-//        Timetable tt = timetableRepository.findById(TimetableRepository.SINGLETON_TIMETABLE_ID);
-//        template.convertAndSend("/topic/plan", tt);
+        System.out.println(solverManager.getSolverStatus(TimetableRepository.SINGLETON_TIMETABLE_ID));
+        System.out.println(timetable.getScore());
     }
 
-    @RequestMapping("/rest/plan/debug")
-    public ResponseEntity<Timetable> debug() {
-        return new ResponseEntity<>(timetable, HttpStatus.OK);
+    @RequestMapping("/rest/plan/stop")
+    public ResponseEntity<Void> stopOptimization() {
+        solverManager.terminateEarly(TimetableRepository.SINGLETON_TIMETABLE_ID);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
