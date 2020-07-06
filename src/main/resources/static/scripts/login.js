@@ -57,6 +57,11 @@ let content = new Vue({
                 return;
             }
 
+            if (username.length > 255) {
+                content.userLoginErrorMessage = "Der Name ist zu lang (maximal 255 Zeichen)!";
+                return;
+            }
+
             if (!username.match(/[a-zA-Z][a-zA-Z]+\.[a-zA-Z][a-zA-Z]+/)) {
                 content.userLoginErrorMessage = "Der Name hat die falsche Form.";
                 return;

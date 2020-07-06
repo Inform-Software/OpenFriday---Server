@@ -34,6 +34,9 @@ public class MainController {
     private final RoomRepository roomRepository;
 
     @Autowired
+    private VoteRepository voteRepository;
+
+    @Autowired
     private TimetableRepository timetableRepository;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -372,8 +375,18 @@ public class MainController {
      * Adds a new workshop
      * @param workshop the workshop to add
      */
+    @Transactional
     @RequestMapping("/rest/workshop/add")
     public ResponseEntity<Void> addWorkshop(@RequestBody Workshop workshop) {
+
+        if (workshop.getId() != null && workshopRepository.findById(workshop.getId()).isPresent()) {
+            int votesHigh = voteRepository.findAllByWorkshopAndPriority(workshop, 2).size();
+            int votesLow = voteRepository.findAllByWorkshopAndPriority(workshop, 1).size();
+            workshop.setVotesHigh(votesHigh);
+            workshop.setVotesLow(votesLow);
+            workshop.setTotalVotes(votesHigh + votesLow);
+        }
+
         workshopRepository.save(workshop);
         template.convertAndSend("/topic/workshops", workshopRepository.findAll());
         return new ResponseEntity<>(HttpStatus.OK);
