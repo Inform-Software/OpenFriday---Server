@@ -24,6 +24,7 @@ public class Workshop {
 
     private String name;
 
+    @Column(name = "description", length = 1000)
     private String description;
 
     // @Formula(value = "(SELECT COUNT(*) FROM vote WHERE vote.workshop_id = id)") // calculates this value by sql statement

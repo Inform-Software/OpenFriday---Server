@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface VoteRepository extends CrudRepository<Vote, Long> {
-
+    public List<Vote> findAllByWorkshopAndPriority(Workshop workshop, int priority);
 }

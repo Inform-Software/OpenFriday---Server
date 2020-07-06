@@ -82,6 +82,9 @@ let content = new Vue({
             workshopBox.workshopDescription = workshop.description;
             workshopBox.workshopSlots = workshop.possibleTimeslots;
             workshopBox.workshopCreator = workshop.creator;
+            workshopBox.workshopVotesTotal = workshop.totalVotes;
+            workshopBox.workshopVotesHigh = workshop.votesHigh;
+            workshopBox.workshopVotesLow = workshop.votesLow;
             toggleWorkshopBox();
 
             // update checkboxes
@@ -107,6 +110,9 @@ let workshopBox = new Vue({
         workshopName: "",
         workshopDescription: "",
         workshopCreator: "",
+        workshopVotesTotal: 0,
+        workshopVotesHigh: 0,
+        workshopVotesLow: 0,
         timeslots: "",
         errormessage: "",
         workshopSlots: ""
@@ -129,6 +135,15 @@ let workshopBox = new Vue({
             }
             if (this.workshopDescription.isEmpty()) {
                 this.errormessage = "Bitte gib eine Beschreibung für den Workshop an!";
+                return;
+            }
+
+            if (this.workshopName.length > 255) {
+                this.errormessage = "Der Titel ist zu lang (" + this.workshopName.length + " Zeichen)!";
+                return;
+            }
+            if (this.workshopDescription.length > 1000) {
+                this.errormessage = "Die Beschreibung ist zu lang (" + this.workshopDescription.length + " Zeichen)!";
                 return;
             }
 
@@ -164,6 +179,9 @@ let workshopBox = new Vue({
                         name: this.workshopName,
                         description: this.workshopDescription,
                         possibleTimeslots: selectedSlots
+                        // totalVotes: this.workshopVotesTotal,
+                        // votesHigh: this.workshopVotesHigh,
+                        // votesLow: this.workshopVotesLow
                     })
                     .then(function () {
                         workshopBox.closeBox();
