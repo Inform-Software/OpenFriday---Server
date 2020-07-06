@@ -78,6 +78,7 @@ public class MainController {
     @RequestMapping("/")
     @ResponseBody
     public ResponseEntity<Void> root (HttpServletResponse response) throws IOException {
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // disable caching
         response.sendRedirect("/web/login.html");                   // redirects to the login page
         return new ResponseEntity<>(HttpStatus.OK);
     }
