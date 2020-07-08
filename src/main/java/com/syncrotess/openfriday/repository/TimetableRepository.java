@@ -20,6 +20,9 @@ public class TimetableRepository {
     @Autowired
     private WorkshopRepository workshopRepository;
 
+    @Autowired
+    private VoteRepository voteRepository;
+
     public Timetable findById(Long id) {
         if (!SINGLETON_TIMETABLE_ID.equals(id)) {
             throw new IllegalStateException("There is no timeTable with id (" + id + ").");
@@ -29,7 +32,8 @@ public class TimetableRepository {
         return new Timetable(
                 timeslotRepository.findAll(),
                 roomRepository.findAll(),
-                workshopRepository.findAll());
+                workshopRepository.findAll(),
+                voteRepository.findAll());
     }
 
     public void save(Timetable timetable) {

@@ -1,8 +1,10 @@
 package com.syncrotess.openfriday.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.syncrotess.openfriday.repository.VoteRepository;
 import org.hibernate.annotations.Formula;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Entity
 public class Workshop {
 
+    @PlanningId
     @Id
     @GeneratedValue
     private Long id;
@@ -42,22 +45,19 @@ public class Workshop {
             foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "FK_WORKSHOP_CREATOR", foreignKeyDefinition = "FOREIGN KEY (creator) REFERENCES user(id) ON DELETE set null"))
     private User creator;
 
-    @PlanningVariable(valueRangeProviderRefs = "timeslotsRange")
+    @PlanningVariable(valueRangeProviderRefs = "timeslotsRange", nullable = true)
     @ManyToOne
     @JoinColumn(name = "TIMESLOT",
             foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "FK_WORKSHOP_TIMESLOT", foreignKeyDefinition = "FOREIGN KEY (timeslot) REFERENCES timeslot(id) ON DELETE set null"))
     // the timeslot the workshop takes place in (used by planner)
     private Timeslot timeslot;
 
-    @PlanningVariable(valueRangeProviderRefs = "roomsRange")
+    @PlanningVariable(valueRangeProviderRefs = "roomsRange", nullable = true)
     @ManyToOne
     @JoinColumn(name = "ROOM",
             foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "FK_WORKSHOP_ROOM", foreignKeyDefinition = "FOREIGN KEY (room) REFERENCES room(id) ON DELETE set null"))
     // the room the workshop takes place in (used by planner)
     private Room room;
-
-//    @OneToMany(mappedBy = "workshop")
-//    private Set<Vote> votes = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "WORKSHOP_AVAILABLE_AT",
