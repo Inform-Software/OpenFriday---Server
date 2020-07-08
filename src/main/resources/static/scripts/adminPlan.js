@@ -3,6 +3,8 @@ ensureAdmin();
 let stompClient = null;
 connect();
 
+let solverStatusInterval = null;
+
 let content = new Vue({
     el: "#content",
     data: {
@@ -10,7 +12,9 @@ let content = new Vue({
             workshops: [],
             timeslots: [],
             rooms: []
-        }
+        },
+        isSolving: false,
+        time: 10
     },
     computed: {
         unusedWorkshops: function () {
@@ -26,6 +30,9 @@ let content = new Vue({
             .post("/rest/plan/get")
             .then(function (response) {
                 content.plan = response.data;
+                for (let i = 0; i < content.plan.workshops.length; i++) {
+                    content.plan.workshops[i].possibleTimeslots = content.plan.workshops[i].possibleTimeslots.sort((a, b) => a.name.localeCompare(b.name))
+                }
             })
     },
     methods: {
@@ -41,7 +48,17 @@ let content = new Vue({
             axios
                 .post("/rest/plan/optimize")
                 .then(function (response) {
-                    // content.plan = response.data;
+                    content.isSolving = response.data !== "NOT_SOLVING";
+                    solverStatusInterval = setInterval(getSolverStatus, 1000);
+                })
+        },
+        stopPlanning: function () {
+            clearInterval(solverStatusInterval);
+            content.time = 10;
+            axios
+                .post("/rest/plan/stop")
+                .then(function (response) {
+                    content.isSolving = response.data !== "NOT_SOLVING";
                 })
         },
         inArray: function (element, array) {
@@ -130,6 +147,9 @@ function connect() {
 
 function onPlanMessageReceived(payload) {
     content.plan = JSON.parse(payload.body);
+    for (let i = 0; i < content.plan.workshops.length; i++) {
+        content.plan.workshops[i].possibleTimeslots = content.plan.workshops[i].possibleTimeslots.sort((a, b) => a.name.localeCompare(b.name))
+    }
 }
 
 function onConnected() {
@@ -139,4 +159,17 @@ function onConnected() {
 
 function onError(error) {
     console.log("Websocket: Could not connect to server.")
+}
+
+function getSolverStatus() {
+    content.time -= 1;
+    axios
+        .post("/rest/plan/getStatus")
+        .then(function (response) {
+            content.isSolving = response.data !== "NOT_SOLVING";
+        })
+    if (!content.isSolving) {
+        content.time = 10;
+        clearInterval(solverStatusInterval);
+    }
 }

@@ -3,6 +3,7 @@ package com.syncrotess.openfriday.core;
 import com.syncrotess.openfriday.entities.*;
 import com.syncrotess.openfriday.repository.*;
 import org.optaplanner.core.api.solver.SolverManager;
+import org.optaplanner.core.api.solver.SolverStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -426,23 +426,30 @@ public class MainController {
     }
 
     @RequestMapping("/rest/plan/optimize")
-    public ResponseEntity<Timetable> optimizeTimetable() {
+    public ResponseEntity<SolverStatus> optimizeTimetable() {
         solverManager.terminateEarly(TimetableRepository.SINGLETON_TIMETABLE_ID); // just to ensure the solver is not running. Otherwise solveAndListen would throw exception
         solverManager.solveAndListen(TimetableRepository.SINGLETON_TIMETABLE_ID,
                 timetableRepository::findById,
                 this::handlePlanDone);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(solverManager.getSolverStatus(TimetableRepository.SINGLETON_TIMETABLE_ID), HttpStatus.OK);
     }
 
     private void handlePlanDone(Timetable timetable) {
         template.convertAndSend("/topic/plan", timetable);
-        System.out.println(solverManager.getSolverStatus(TimetableRepository.SINGLETON_TIMETABLE_ID));
-        System.out.println(timetable.getScore());
+//        System.out.println("====================================================================");
+//        System.out.println(timetable.getScore());
+//        System.out.println(solverManager.getSolverStatus(TimetableRepository.SINGLETON_TIMETABLE_ID));
+//        System.out.println(timetable);
     }
 
     @RequestMapping("/rest/plan/stop")
-    public ResponseEntity<Void> stopOptimization() {
+    public ResponseEntity<SolverStatus> stopOptimization() {
         solverManager.terminateEarly(TimetableRepository.SINGLETON_TIMETABLE_ID);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(solverManager.getSolverStatus(TimetableRepository.SINGLETON_TIMETABLE_ID), HttpStatus.OK);
+    }
+
+    @RequestMapping("/rest/plan/getStatus")
+    public ResponseEntity<SolverStatus> getSolverStatus() {
+        return new ResponseEntity<>(solverManager.getSolverStatus(TimetableRepository.SINGLETON_TIMETABLE_ID), HttpStatus.OK);
     }
 }

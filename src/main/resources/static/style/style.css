@@ -64,19 +64,11 @@ textarea {
         left: 2.5% !important;
         width: 95% !important;
     }
-
-    .table-content {
-        margin: 0;
-    }
 }
 
 @media screen and (max-height: 700px) {
     .popup-box {
         position: absolute !important;
-    }
-
-    .table-content {
-        margin: 0;
     }
 }
 
@@ -147,6 +139,7 @@ textarea {
 
 .table-content {
     max-width: 100%;
+    margin: 0;
 }
 
 .blocked-table-data {

@@ -1,5 +1,6 @@
 package com.syncrotess.openfriday.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.syncrotess.openfriday.repository.VoteRepository;
 import org.hibernate.annotations.Formula;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -57,9 +58,6 @@ public class Workshop {
             foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "FK_WORKSHOP_ROOM", foreignKeyDefinition = "FOREIGN KEY (room) REFERENCES room(id) ON DELETE set null"))
     // the room the workshop takes place in (used by planner)
     private Room room;
-
-//    @OneToMany(mappedBy = "workshop")
-//    private Set<Vote> votes = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "WORKSHOP_AVAILABLE_AT",
