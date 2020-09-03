@@ -13,8 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
-    <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>-->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -70,13 +70,14 @@
                                 <div v-else-if="plan.workshops.find(ws => ws.room && ws.timeslot && ws.room.id === room.id && ws.timeslot.id === timeslot.id)" v-bind:id="plan.workshops.find(ws => ws.room && ws.timeslot && ws.room.id === room.id && ws.timeslot.id === timeslot.id).id" draggable="true" ondragstart="dragFromTable(event)" class="draggable">
                                     <div class="jumbotron table-content">
                                         <div class="row">
-                                            <div class="col-10">
+                                            <div class="col-8">
                                                 <span v-bind:class="{'text-danger': inArray(timeslot.id, plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).possibleTimeslots.map(ts => ts.id)) < 0}">
                                                     {{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).possibleTimeslots.map(s => s.name.split('-')[0].trim()).join(" | ")}}
                                                 </span>
                                             </div>
-                                            <div class="col-2">
-                                                {{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).totalVotes}}
+                                            <div class="col-4 text-right">
+                                                <span class="badge badge-primary badge-high">{{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).votesHigh}}</span>
+                                                <span class="badge badge-primary badge-low">{{plan.workshops.find(ws => ws.room && ws.room.id === room.id && ws.timeslot.id === timeslot.id).votesLow}}</span>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -101,8 +102,7 @@
     <div class="row justify-content-center">
         <div class="col-10 col-md-6 jumbotron" ondragover="event.preventDefault();" ondrop="dropInList(event)">
             <h5>Aussortierte Workshops</h5>
-            <small>Diese Workshops werden bei der Optimierung der Planung nicht ber&uuml;cksichtigt.<br>
-            Workshops aus der Tabelle hier hin ziehen, um sie auszusortieren.</small>
+            <small>Workshops aus der Tabelle hier hin ziehen, um sie auszusortieren.</small>
         </div>
     </div>
     <div v-for="workshop in unusedWorkshops">
@@ -112,8 +112,9 @@
                     <div class="col-10">
                         {{workshop.possibleTimeslots.map(timeslot => timeslot.name.split('-')[0].trim()).join(" | ")}}
                     </div>
-                    <div class="col-2">
-                        {{workshop.totalVotes}}
+                    <div class="col-2 text-right">
+                        <span class="badge badge-primary badge-high">{{workshop.votesHigh}}</span>
+                        <span class="badge badge-primary badge-low">{{workshop.votesLow}}</span>
                     </div>
                 </div>
                 <div class="row">

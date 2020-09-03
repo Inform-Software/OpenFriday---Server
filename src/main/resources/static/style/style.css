@@ -30,7 +30,6 @@
 }
 
 .btn-link {
-    /*text-decoration: underline;*/
     color: #0091a5;
 }
 
@@ -172,7 +171,6 @@ textarea {
 }
 
 .header {
-    /*font-weight: bold;*/
     font-weight: 400;
     font-size: 1.25rem;
     line-height: 1.5;
@@ -182,4 +180,14 @@ textarea {
 
 .custom-control-label {
     font-size: 1rem;
+}
+
+.badge-high {
+    border: #e1e1e1 solid thin;
+    background-color: #7ab51d !important;
+}
+
+.badge-low {
+    border: #e1e1e1 solid thin;
+    background-color: #fabb00 !important;
 }

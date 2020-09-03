@@ -13,6 +13,7 @@ function connect() {
 
     let socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
+    stompClient.debug = () => {};
 
     stompClient.connect({}, onConnected, onError);
 }
@@ -74,7 +75,11 @@ let content = new Vue({
                     .post("/rest/slot/delete/" + slot.id)
                     .then(function () {
                         // alert("Slot gelöscht!");
-                        console.log("Raum gelöscht")
+                        console.log("Slot gelöscht")
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("FEHLER. Slot konnte nicht gelöscht werden.")
                     });
             }
         },
@@ -85,6 +90,10 @@ let content = new Vue({
                     .then(function () {
                         // alert("Raum gelöscht!");
                         console.log("Raum gelöscht")
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("FEHLER. Raum konnte nicht gelöscht werden.")
                     });
             }
         },
@@ -138,6 +147,10 @@ let slotBox = new Vue({
                         alert("Slot gespeichert.");
                         toggleSlotBox();
                     })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("FEHLER. Slot konnte nicht gespeichert werden.")
+                    })
             }
             else {
                 axios
@@ -145,6 +158,10 @@ let slotBox = new Vue({
                     .then(function () {
                         alert("Slot hinzugefügt.");
                         toggleSlotBox();
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("FEHLER. Slot konnte nicht gespeichert werden.")
                     })
             }
         }
@@ -207,6 +224,10 @@ let roomBox = new Vue({
                         alert("Raum gespeichert.");
                         toggleRoomBox();
                     })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("FEHLER. Raum konnte nicht gespeichert werden.")
+                    })
             }
             else {
                 axios
@@ -218,6 +239,10 @@ let roomBox = new Vue({
                     .then(function () {
                         alert("Raum hinzugefügt.");
                         toggleRoomBox();
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("FEHLER. Raum konnte nicht gespeichert werden.")
                     })
             }
         }

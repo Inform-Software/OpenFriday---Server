@@ -36,6 +36,7 @@ let adminLogin = new Vue({
                     }
                     else {
                         console.log(error);
+                        alert("FEHLER. User konnte nicht angemeldet werden.");
                     }
                 })
         }
@@ -68,7 +69,7 @@ let content = new Vue({
             }
 
             axios
-                .post("/rest/login/user/", {name: username})
+                .post("/rest/login/user", {name: username})
                 .then(function(response){
                     setCookie("user", JSON.stringify(response.data));
                     window.location.href = "/web/start.html";
@@ -79,6 +80,7 @@ let content = new Vue({
                     }
                     else {
                         console.log(error);
+                        alert("FEHLER. User konnte nicht angemeldet werden.");
                     }
                 })
         }

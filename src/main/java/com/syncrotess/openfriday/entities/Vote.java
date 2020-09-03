@@ -1,5 +1,7 @@
 package com.syncrotess.openfriday.entities;
 
+import org.optaplanner.core.api.domain.lookup.PlanningId;
+
 import javax.persistence.*;
 import java.io.Serializable;
 

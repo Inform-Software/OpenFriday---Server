@@ -62,7 +62,8 @@ let content = new Vue({
 
             axios
                 .post("/rest/user/setslots/" + user.id, content.timeslots.filter(s => $.inArray(s.id, slotIds) > -1))
-                .catch(function () {
+                .catch(function (error) {
+                    console.log(error);
                     alert("Fehler: Zeiten konnten nicht gespeichert werden.")
                 })
         },
@@ -72,6 +73,10 @@ let content = new Vue({
                     .post("/rest/workshop/delete/" + workshop.id)
                     .then(function () {
                         console.log("Workshop gelöscht");
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("Workshop konnte nicht gelöscht werden.")
                     });
             }
         },
@@ -96,6 +101,10 @@ let content = new Vue({
                 .post("/rest/user/vote/" + user.id + "/" + workshop.id)
                 .then(function (response) {
                     content.votes = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    alert("Ein unbekannter Fehler ist aufgetreten. Die Stimme konnte nicht verwertet werden.")
                 })
         }
     }
@@ -186,6 +195,10 @@ let workshopBox = new Vue({
                     .then(function () {
                         workshopBox.closeBox();
                     })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("Ein unbekannter Fehler ist aufgetreten! Der Workshop konnte nicht gespeichert werden.")
+                    })
             }
             else {
                 axios
@@ -197,6 +210,10 @@ let workshopBox = new Vue({
                     })
                     .then(function () {
                         workshopBox.closeBox();
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("Ein unbekannter Fehler ist aufgetreten! Der Workshop konnte nicht gespeichert werden.")
                     })
             }
         },
@@ -266,6 +283,7 @@ function connect() {
 
     let socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
+    stompClient.debug = () => {};
 
     stompClient.connect({}, onConnected, onError);
 }

@@ -39,19 +39,3 @@ let content = new Vue({
         }
     }
 })
-
-
-
-// other functions
-
-/*
-function containsWorkshop(nestedMap, workshopID) {
-    for (let value of nestedMap.values()) {
-        for (let otherValue of value.values()) {
-            if (otherValue === workshopID) {
-                return true;
-            }
-        }
-    }
-    return false;
-}*/

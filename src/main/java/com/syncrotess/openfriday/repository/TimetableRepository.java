@@ -36,6 +36,7 @@ public class TimetableRepository {
                 voteRepository.findAll());
     }
 
+    // Only the workshops have to be saved, as the rooms and timeslots don't change during planning
     public void save(Timetable timetable) {
         for (Workshop workshop : timetable.getWorkshops()) {
             workshopRepository.save(workshop);

@@ -18,7 +18,7 @@ let content = new Vue({
     },
     computed: {
         unusedWorkshops: function () {
-            return this.plan.workshops.filter(ws => !ws.room && !ws.timeslot)
+            return this.plan.workshops.filter(ws => !ws.room && !ws.timeslot).sort((a, b) => b.votesHigh - a.votesHigh);
         }
         // timestamp_string: function () {
         //     return this.timestamp.getDate() + "." + this.timestamp.getMonth() + "." + this.timestamp.getFullYear() + ", "
@@ -43,6 +43,10 @@ let content = new Vue({
                     // content.timestamp = new Date(response.data);
                     alert("Planung gespeichert");
                 })
+                .catch(function (error) {
+                    console.log(error);
+                    alert("FEHLER. Der Plan konnte nicht gespeichert werden.")
+                })
         },
         optimizePlan: function () {
             axios
@@ -50,6 +54,10 @@ let content = new Vue({
                 .then(function (response) {
                     content.isSolving = response.data !== "NOT_SOLVING";
                     solverStatusInterval = setInterval(getSolverStatus, 1000);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    alert("FEHLER. Der Plan kann nicht optimiert werden.")
                 })
         },
         stopPlanning: function () {
@@ -139,7 +147,7 @@ function connect() {
 
     let socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
-    // stompClient.debug = () => {};
+    stompClient.debug = () => {};
 
     stompClient.connect({}, onConnected, onError);
 }

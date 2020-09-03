@@ -13,6 +13,7 @@ function connect() {
 
     let socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
+    stompClient.debug = () => {};
 
     stompClient.connect({}, onConnected, onError);
 }

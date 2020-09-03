@@ -13,8 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
-<!--    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>-->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -30,18 +30,6 @@
         </div>
     </div>
     <div class="container-fluid" id="content" v-bind:class="{disabledDiv: isDisabled}">
-
-<!--        <div class="row justify-content-center">-->
-<!--            <div class="col-10 col-md-6 horizontal-centered-text jumbotron">-->
-<!--                <div v-show="admin">-->
-<!--                    <i class="fas fa-user-crown user-icon"></i>-->
-<!--                </div>-->
-<!--                <div v-show="!admin">-->
-<!--                    <i class="fas fa-user user-icon"></i>-->
-<!--                </div>-->
-<!--                Angemeldet als: {{username}}-->
-<!--            </div>-->
-<!--        </div>-->
         <div class="row justify-content-center">
             <div class="col-10 col-md-6">
                 <button class="btn btn-primary btn-lg btn-block" v-if="admin" onclick="window.location.href = '/web/admin.html'">Adminfunktionen</button>
@@ -56,14 +44,7 @@
                 <form v-on:submit.prevent="saveUserSlots()">
                     <div v-for="timeslot in timeslots">
                         <div class="row">
-
-<!--                            <div class="col">
-                                <label class="form-check-label" v-bind:for="timeslot.id">
-                                    {{timeslot.name}}
-                                </label>
-                            </div>-->
                             <div class="col">
-<!--                                <input class="form-check-input" type="checkbox" name="time-timeslot" v-bind:id="timeslot.id">-->
                                 <div class="custom-control custom-switch form-control-lg">
                                     <input type="checkbox" class="custom-control-input" name="time-slot" v-bind:id="timeslot.id" v-on:change="saveUserSlots()">
                                     <label class="custom-control-label" v-bind:for="timeslot.id">{{timeslot.name}}</label>
@@ -71,7 +52,6 @@
                             </div>
                         </div>
                     </div>
-<!--                    <button class="btn btn-primary btn-lg btn-block" style="margin-top: 1rem" type="submit">Zeiten speichern</button>-->
                 </form>
 
             </div>
@@ -108,7 +88,8 @@
                             {{workshop.possibleTimeslots.map(timeslot => timeslot.name.split('-')[0].trim()).join(" | ")}}
                         </div>
                         <div class="col-2 text-right">
-                            {{workshop.totalVotes}}
+                            <span class="badge badge-primary badge-high">{{workshop.votesHigh}}</span>
+                            <span class="badge badge-primary badge-low">{{workshop.votesLow}}</span>
                         </div>
                     </div>
                     <div class="row">
@@ -135,41 +116,6 @@
                         </div>
                     </div>
                 </div>
-<!--                <div class="col-10 col-md-6 jumbotron workshop" v-on:click="voteForWorkshop(workshop)"
-                     v-bind:class="{ 'workshop-prio-high': votes.has(workshop.id) && votes.get(workshop.id) === 2,
-                                    'workshop-prio-low': votes.has(workshop.id) && votes.get(workshop.id) === 1}">
-                    <div class="row">
-                        <div class="col workshop-header">
-                            {{workshop.name}}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            {{workshop.timeslots.map(timeslot => timeslot.name.split('-')[0].trim()).join(" / ")}}
-                        </div>
-                    </div>
-                    <div class="row" v-if="workshop.creator === username || admin">
-                        <div class="col-6">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-primary btn-sm" v-on:click.stop="openEditBox(workshop)">Bearbeiten</button>
-                                <button type="button" class="btn btn-danger" v-on:click.stop="deleteWorkshop(workshop)">L&ouml;schen</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            Beschreibung: {{workshop.description}}
-                        </div>
-                    </div>
-                    <div class="row workshop-footer">
-                        <div class="col-10">
-                            {{workshop.creator}}
-                        </div>
-                        <div class="col-2">
-                            {{workshop.votesHigh + workshop.votesLow}}
-                        </div>
-                    </div>
-                </div>-->
             </div>
         </div>
 
